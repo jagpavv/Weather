@@ -7,13 +7,7 @@ import NVActivityIndicatorView
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 
-  @IBOutlet weak var locationLabel: UILabel!
-  @IBOutlet weak var dayLabel: UILabel!
-  @IBOutlet weak var conditionImageView: UIImageView!
-  @IBOutlet weak var conditionLabel: UILabel!
-  @IBOutlet weak var temperatueLabel: UILabel!
-  @IBOutlet weak var backgroundView: UIView!
-
+  // MARK: - Properties
   let gradientLayer: CAGradientLayer = CAGradientLayer()
   let apiKey = "4c8b3b461a4559a8ac0c397de4b3aaaf"
 
@@ -23,6 +17,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
   var activityIndicator: NVActivityIndicatorView!
   let locationManager = CLLocationManager()
 
+  // MARK: IBOutlets
+  @IBOutlet weak var locationLabel: UILabel!
+  @IBOutlet weak var dayLabel: UILabel!
+  @IBOutlet weak var conditionImageView: UIImageView!
+  @IBOutlet weak var conditionLabel: UILabel!
+  @IBOutlet weak var temperatueLabel: UILabel!
+  @IBOutlet weak var backgroundView: UIView!
+
+  // MARK: Life Cycle
   override func viewDidLoad() {
     super.viewDidLoad()
     backgroundView.layer.addSublayer(gradientLayer)
@@ -47,11 +50,23 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     setBlueGradientBackground()
   }
 
-  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    let location = locations[0]
-    lat = location.coordinate.latitude
-    lon = location.coordinate.longitude
+  // MARK: - Methods
+  // MARK: Custom Method
+  func setBlueGradientBackground() {
+    let topColor = UIColor(red: 95.0/255.0, green: 165.0/255.0, blue: 1.0, alpha: 1.0).cgColor
+    let bottomColor = UIColor(red: 72.0/255.0, green: 114.0/255.0, blue: 184.0/255.0, alpha: 1.0).cgColor
+    gradientLayer.frame = view.bounds
+    gradientLayer.colors = [topColor, bottomColor]
+  }
 
+  func setGrayGradientBackground() {
+    let topColor = UIColor(red: 155.0/255.0, green: 155.0/255.0, blue: 72.0/255/0, alpha: 1.0).cgColor
+    let bottomColor = UIColor(red: 72.0/255.0, green: 114.0/255.0, blue: 184.0/255.0, alpha: 1.0).cgColor
+    gradientLayer.frame = view.bounds
+    gradientLayer.colors = [topColor, bottomColor]
+  }
+
+  func getWeather(lat: Double, lon: Double) {
     Alamofire.request("https://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&apiKey=\(apiKey)").responseJSON { (response) in
       self.activityIndicator.stopAnimating()
       if let responseStr = response.result.value {
@@ -81,24 +96,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
       }
     }
+  }
+
+  // MARK: Delegate Method
+  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    let location = locations[0]
+    lat = location.coordinate.latitude
+    lon = location.coordinate.longitude
+
+    getWeather(lat: lat, lon: lon)
     self.locationManager.stopUpdatingLocation()
   }
 
   func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     print(error.localizedDescription)
-  }
-
-  func setBlueGradientBackground() {
-    let topColor = UIColor(red: 95.0/255.0, green: 165.0/255.0, blue: 1.0, alpha: 1.0).cgColor
-    let bottomColor = UIColor(red: 72.0/255.0, green: 114.0/255.0, blue: 184.0/255.0, alpha: 1.0).cgColor
-    gradientLayer.frame = view.bounds
-    gradientLayer.colors = [topColor, bottomColor]
-  }
-
-  func setGrayGradientBackground() {
-    let topColor = UIColor(red: 155.0/255.0, green: 155.0/255.0, blue: 72.0/255/0, alpha: 1.0).cgColor
-    let bottomColor = UIColor(red: 72.0/255.0, green: 114.0/255.0, blue: 184.0/255.0, alpha: 1.0).cgColor
-    gradientLayer.frame = view.bounds
-    gradientLayer.colors = [topColor, bottomColor]
   }
 }

@@ -11,7 +11,7 @@
 		ACF164F421CE3BFB0078DAFF /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F321CE3BFB0078DAFF /* MainViewController.swift */; };
 		ACF164F621CE3D660078DAFF /* SearchCityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F521CE3D660078DAFF /* SearchCityViewController.swift */; };
 		ACF164F821CE3FA70078DAFF /* MainViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F721CE3FA70078DAFF /* MainViewCell.swift */; };
-		ACF164FA21CE51060078DAFF /* SearchCityViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F921CE51060078DAFF /* SearchCityViewCell.swift */; };
+		ACF164FC21CE87A10078DAFF /* SelectedCity.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164FB21CE87A10078DAFF /* SelectedCity.swift */; };
 		ACF543F321CBB832004F9263 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF543F221CBB832004F9263 /* AppDelegate.swift */; };
 		ACF543F521CBB832004F9263 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF543F421CBB832004F9263 /* ViewController.swift */; };
 		ACF543F821CBB832004F9263 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ACF543F621CBB832004F9263 /* Main.storyboard */; };
@@ -27,7 +27,7 @@
 		ACF164F321CE3BFB0078DAFF /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		ACF164F521CE3D660078DAFF /* SearchCityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCityViewController.swift; sourceTree = "<group>"; };
 		ACF164F721CE3FA70078DAFF /* MainViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewCell.swift; sourceTree = "<group>"; };
-		ACF164F921CE51060078DAFF /* SearchCityViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCityViewCell.swift; sourceTree = "<group>"; };
+		ACF164FB21CE87A10078DAFF /* SelectedCity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedCity.swift; sourceTree = "<group>"; };
 		ACF543EF21CBB832004F9263 /* Weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACF543F221CBB832004F9263 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ACF543F421CBB832004F9263 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -93,8 +93,8 @@
 				ACF543F621CBB832004F9263 /* Main.storyboard */,
 				ACF164F321CE3BFB0078DAFF /* MainViewController.swift */,
 				ACF164F721CE3FA70078DAFF /* MainViewCell.swift */,
+				ACF164FB21CE87A10078DAFF /* SelectedCity.swift */,
 				ACF164F521CE3D660078DAFF /* SearchCityViewController.swift */,
-				ACF164F921CE51060078DAFF /* SearchCityViewCell.swift */,
 				ACF543FC21CBB834004F9263 /* Assets.xcassets */,
 				ACF543FE21CBB834004F9263 /* LaunchScreen.storyboard */,
 				ACF5440121CBB834004F9263 /* Info.plist */,
@@ -219,9 +219,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACF164FA21CE51060078DAFF /* SearchCityViewCell.swift in Sources */,
 				ACF543FB21CBB832004F9263 /* Weather.xcdatamodeld in Sources */,
 				ACF164F821CE3FA70078DAFF /* MainViewCell.swift in Sources */,
+				ACF164FC21CE87A10078DAFF /* SelectedCity.swift in Sources */,
 				ACF164F621CE3D660078DAFF /* SearchCityViewController.swift in Sources */,
 				ACF543F521CBB832004F9263 /* ViewController.swift in Sources */,
 				ACF543F321CBB832004F9263 /* AppDelegate.swift in Sources */,

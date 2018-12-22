@@ -1,4 +1,4 @@
-
+// chagne custom cell to default sytle & text
 import UIKit
 
 class SearchCityViewCell: UITableViewCell {

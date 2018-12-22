@@ -7,15 +7,16 @@ import CoreLocation
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
   let cellIdentifier = "weatherDisplayCell"
-  let tempCityName: [String] = ["A", "B", "C", "D", "A", "B", "C" ]
-  let tempTemperaure: [String] = ["1", "2", "3", "4", "5", "6", "7"]
+  let tempCityName: [String] = [String]()
+  let tempTemperaure: [String] = [String]()
   let tempImageName = "01d"
 
+  @IBAction func unwindFromSearchCityView(_ segue: UIStoryboardSegue) {
+    print("successfully unwined form search city view Controller")
+  }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
     }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

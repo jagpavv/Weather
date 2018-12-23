@@ -5,7 +5,7 @@ import Foundation
 class SearchCityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchResultsUpdating {
 
   let cellIdentifier = "serchedCityDisplayCell"
-  let unwindSegue = "unwindToMainViewSegue"
+  let unwindSegueIdentifier = "unwindToMainViewSegue"
   let searchController = UISearchController(searchResultsController: nil)
   let tempCityName2: [String] = ["Berlin", "Paris", "Hamburg", "Seoul", "Tokyo", "Taipei"]
 
@@ -25,10 +25,10 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   func setSearchController() {
     searchController.searchBar.delegate = self
     searchController.searchResultsUpdater = self
-//    searchController.hidesNavigationBarDuringPresentation = false
+    //    searchController.hidesNavigationBarDuringPresentation = false
     searchController.dimsBackgroundDuringPresentation = false
     searchController.searchBar.placeholder = "Enter the city name"
-//    definesPresentationContext = true // when user navigates to another view controller, search bar does not remain on the screen.
+    //    definesPresentationContext = true // when user navigates to another view controller, search bar does not remain on the screen.
     tableView.tableHeaderView = searchController.searchBar
   }
 
@@ -60,13 +60,13 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let selectedText = tableView.cellForRow(at: indexPath)?.textLabel?.text else { return }
     selectedCity = selectedText
-    performSegue(withIdentifier: unwindSegue, sender: self)
+    performSegue(withIdentifier: unwindSegueIdentifier, sender: self)
     print("selectedText: \(selectedText)")
   }
 
-//   MARK: - Navigation
+  //   MARK: - Navigation
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == unwindSegue {
+    if segue.identifier == unwindSegueIdentifier {
       guard let selectedCity = self.selectedCity else { return }
       let MainVC = segue.destination as! MainViewController
       MainVC.tempCityArr.append(selectedCity)

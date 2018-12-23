@@ -1,13 +1,15 @@
 import UIKit
 import Foundation
 
-// need to done 1)tapped cell 2) Searchbar clear button
+// need to done 1)tapped cell 2) Searchbar clear button 3) search bar in the UINavigationItem position
 class SearchCityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchResultsUpdating {
 
   let cellIdentifier = "serchedCityDisplayCell"
   let unwindSegueIdentifier = "unwindToMainViewSegue"
+
   let searchController = UISearchController(searchResultsController: nil)
-  let tempCityName2: [String] = ["Berlin", "Paris", "Hamburg", "Seoul", "Tokyo", "Taipei"]
+
+  let tempCityName2: [String] = ["London", "Berlin", "Paris", "Hamburg", "Seoul", "Tokyo", "Taipei"]
 
   var filteredCity = [String]()
   var selectedCity: String!
@@ -25,13 +27,33 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   func setSearchController() {
     searchController.searchBar.delegate = self
     searchController.searchResultsUpdater = self
-    //    searchController.hidesNavigationBarDuringPresentation = false
+    searchController.hidesNavigationBarDuringPresentation = false
+    searchController.obscuresBackgroundDuringPresentation = false
     searchController.dimsBackgroundDuringPresentation = false
     searchController.searchBar.placeholder = "Enter the city name"
-    //    definesPresentationContext = true // when user navigates to another view controller, search bar does not remain on the screen.
+    searchController.definesPresentationContext = true // when user navigates to another view controller, search bar does not remain on the screen.
     tableView.tableHeaderView = searchController.searchBar
+
+
+    // another
+//    var searchController: UISearchController!
+//
+//    self.navigationController?.navigationBar.prefersLargeTitles = true
+//    self.navigationItem.title = "Search"
+//    self.navigationItem.hidesSearchBarWhenScrolling = false
+//    self.navigationItem.largeTitleDisplayMode = .always
+//    searchController = UISearchController(searchResultsController: nil)
+//    self.navigationItem.searchController = searchController
+//    searchController.searchResultsUpdater = self
+//
+//    searchController.obscuresBackgroundDuringPresentation = false
+//    searchController.searchBar.placeholder = "Search City"
+//    navigationItem.searchController = searchController
+//    definesPresentationContext = true
+
   }
 
+  // consider 'func updateSearchResults' move to extension?
   func updateSearchResults(for searchController: UISearchController) {
     if let searchText = searchController.searchBar.text, !searchText.isEmpty {
       filteredCity = tempCityName2.filter { city in
@@ -69,8 +91,8 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
     if segue.identifier == unwindSegueIdentifier {
       guard let selectedCity = self.selectedCity else { return }
       let MainVC = segue.destination as! MainViewController
-      MainVC.tempCityArr.append(selectedCity)
-      print("MainVC.tempCityArr: \(MainVC.tempCityArr)")
+      MainVC.selectedCity.append(selectedCity)
+      print("MainVC.tempCityArr: \(MainVC.selectedCity)")
     }
   }
 }

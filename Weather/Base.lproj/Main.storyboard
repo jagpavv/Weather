@@ -196,6 +196,9 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="uSn-X9-8dy" kind="unwind" identifier="unwindToMainViewSegue" unwindAction="unwindFromSearchCityView:" id="ZA1-vT-xbg"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -218,6 +221,7 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wJo-G7-Kqg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="uSn-X9-8dy" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1679.7101449275362" y="724.55357142857144"/>
         </scene>

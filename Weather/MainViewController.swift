@@ -7,11 +7,21 @@ import CoreLocation
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
   let cellIdentifier = "weatherDisplayCell"
-  let tempCityName: [String] = [String]()
+  var tempCityArr: [String] = [String]()
   let tempTemperaure: [String] = [String]()
   let tempImageName = "01d"
 
   @IBAction func unwindFromSearchCityView(_ segue: UIStoryboardSegue) {
+    print("MinViewController's tempCityArr \(tempCityArr)")
+
+//    if sender.source is AddCharacterViewController {
+//      if let senderVC = sender.source as? AddCharacterViewController {
+//        //SAVE TO CORE DATA
+//        save(name: senderVC.character)
+//        //                madMenCharacters.append(senderVC.character)
+//      }
+//      tableView.reloadData()
+//    }
     print("successfully unwined form search city view Controller")
   }
 
@@ -20,13 +30,13 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return tempCityName.count
+    return tempCityArr.count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
     let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: self.cellIdentifier, for: indexPath) as! MainViewCell
-    cell.cityLabel.text = self.tempCityName[indexPath.row]
+    cell.cityLabel.text = self.tempCityArr[indexPath.row]
     cell.temperatureLabel.text = self.tempTemperaure[indexPath.row]
     cell.conditionImageView.image = UIImage(named: tempImageName)
     return cell

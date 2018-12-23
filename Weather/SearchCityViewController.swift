@@ -5,10 +5,13 @@ import Foundation
 class SearchCityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchResultsUpdating {
 
   let cellIdentifier = "serchedCityDisplayCell"
+  let unwindSegue = "unwindToMainViewSegue"
   let searchController = UISearchController(searchResultsController: nil)
   let tempCityName2: [String] = ["Berlin", "Paris", "Hamburg", "Seoul", "Tokyo", "Taipei"]
 
   var filteredCity = [String]()
+  var selectedCity: String!
+  var selectedIndextPath: IndexPath!
 
   @IBOutlet weak var tableView: UITableView!
 
@@ -56,13 +59,18 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let selectedText = tableView.cellForRow(at: indexPath)?.textLabel?.text else { return }
-    let selectedCity = SelectedCity(name: selectedText)
-    print(selectedText)
-    print(selectedCity.city)
+    selectedCity = selectedText
+    performSegue(withIdentifier: unwindSegue, sender: self)
+    print("selectedText: \(selectedText)")
   }
 
-  // MARK: - Navigation
-//  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//
-//    }
+//   MARK: - Navigation
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == unwindSegue {
+      guard let selectedCity = self.selectedCity else { return }
+      let MainVC = segue.destination as! MainViewController
+      MainVC.tempCityArr.append(selectedCity)
+      print("MainVC.tempCityArr: \(MainVC.tempCityArr)")
+    }
+  }
 }

@@ -11,8 +11,9 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   let cellIdentifier = "weatherDisplayCell"
 
+  var weatherInfos = [WeatherInfo]()
   // Properties below this line undecide yet let or var
-//  var weatherInfos = [WeatherInfo]()
+  var tempSelectedCityArr: [String] = [String]()
 
   var selectedCity: [String] = [String]()
   let tempTemperaure: [String] = ["1"]
@@ -39,19 +40,19 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let json = JSON(value)
 
         let cityName = json["name"].stringValue
-        let temperature = json["main"]["temp"].doubleValue
-        let iconID = json["weather"][0]["icon"].stringValue
+//        let temperature = json["main"]["temp"].doubleValue
+//        let iconID = json["weather"][0]["icon"].stringValue
+
+        for i in json.arrayValue {
+          let info = WeatherInfo.init(json: i)
+          self.weatherInfos.append(info)
+          print(self.weatherInfos)
+        }
 
         print(cityName)
-        print(temperature)
-        print(iconID)
+//        print(temperature)
+//        print(iconID)
 
-//        for infoDic in json.arrayValue {
-//          let info = WeatherInfo.init(infos: infoDic)
-//          self.weatherInfos.append(info)
-//
-//          print(self.weatherInfos)
-//        }
       case .failure(let error):
         print(error)
       }

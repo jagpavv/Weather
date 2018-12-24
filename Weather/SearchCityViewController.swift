@@ -20,6 +20,13 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   override func viewDidLoad() {
     super.viewDidLoad()
     setSearchController()
+    getCityList()
+  }
+
+  func getCityList() {
+    let asset = NSDataAsset(name: "cityList", bundle: Bundle.main)
+    let json = try? JSONSerialization.jsonObject(with: asset!.data, options: JSONSerialization.ReadingOptions.allowFragments)
+    print(json)
   }
 
   // MARK: - Methods

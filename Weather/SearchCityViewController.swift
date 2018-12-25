@@ -9,7 +9,8 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
 
   let searchController = UISearchController(searchResultsController: nil)
 
-  let tempCityName2: [String] = ["London", "Berlin", "Paris", "Hamburg", "Seoul", "Tokyo", "Taipei"]
+//  let tempCityName2: [String] = ["London", "Berlin", "Paris", "Hamburg", "Seoul", "Tokyo", "Taipei"]
+  var cityArr: [String] = [String]()
 
   var filteredCity = [String]()
   var selectedCity: String!
@@ -20,13 +21,26 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   override func viewDidLoad() {
     super.viewDidLoad()
     setSearchController()
-    getCityList()
+
+    DispatchQueue.main.async {
+      self.getCityList()
+    }
   }
 
+  // when and how to make fast loading...?
   func getCityList() {
-    let asset = NSDataAsset(name: "cityList", bundle: Bundle.main)
-    let json = try? JSONSerialization.jsonObject(with: asset!.data, options: JSONSerialization.ReadingOptions.allowFragments)
-    print(json)
+    if let asset = NSDataAsset(name: "cityList", bundle: Bundle.main) {
+      do {
+        //        let json = try? JSONSerialization.jsonObject(with: asset.data, options: JSONSerialization.ReadingOptions.allowFragments)
+        if let json = try? JSONSerialization.jsonObject(with: asset.data, options: []) as! [[String: Any]] {
+          for city in json {
+            let a = city["name"] as! String
+            cityArr.append(a)
+            print(a)
+          }
+        }
+      }
+    }
   }
 
   // MARK: - Methods
@@ -60,15 +74,26 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
 
   }
 
-  // consider 'func updateSearchResults' move to extension?
   func updateSearchResults(for searchController: UISearchController) {
     if let searchText = searchController.searchBar.text, !searchText.isEmpty {
-      filteredCity = tempCityName2.filter { city in
+      filteredCity = cityArr.filter { city in
         return city.lowercased().contains(searchText.lowercased())
       }
     }
     tableView.reloadData()
   }
+
+
+  // consider 'func updateSearchResults' move to extension?
+// orginal code
+//  func updateSearchResults(for searchController: UISearchController) {
+//    if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+//      filteredCity = tempCityName2.filter { city in
+//        return city.lowercased().contains(searchText.lowercased())
+//      }
+//    }
+//    tableView.reloadData()
+//  }
 
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
     searchBar.text = ""

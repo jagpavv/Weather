@@ -1,7 +1,6 @@
 import UIKit
 import Foundation
 import Alamofire
-import SwiftyJSON
 import CoreLocation
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -14,10 +13,14 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   var weatherInfos = [WeatherInfo]()
   var weatherDic = [String: Any]()
   var weather = [[String: Any]]()
-
+  private lazy var jsonDecoder: JSONDecoder = {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return decoder
+  }()
 
   var tempSelectedCityArr: [String] = [String]()
-  var selectedCity: [String] = ["London"]
+  var selectedCity: [String] = []
 
   // Properties below this line undecide yet let or var
 //  var tempTemperaure: [Double] = [Double]()
@@ -51,51 +54,12 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       let url = openWeatherMapBaseURL + cityString + openWeatherMapAPIKey
       print(url)
 
-      Alamofire.request(url, method: .get).validate().responseJSON { response in
+      Alamofire.request(url, method: .get).validate().responseData { response in
         switch response.result {
-        case.success(let value):
-          let json = JSON(value)
-
-//          let cityName = json["name"].stringValue
-//          let temperature = (json["main"]["temp"].doubleValue) - 273
-//          let iconID = json["weather"][0]["icon"].stringValue
-//
-//          self.weatherDic = ["name": cityName,
-//                             "temp": temperature,
-//                              "icon": iconID]
-//
-//
-//          self.weather.append(self.weatherDic)
-//
-//          print(self.weather)
-          print(json)
-
-           let weatherInfo = WeatherInfo(json: json)
-
-
-//            weatherInfo.wind.speed
-            self.weatherInfos.append(weatherInfo)
-            print(self.weatherInfos)
-
-//          print(weatherInfo.wind["speed"])
-//          print(weatherInfo.wind.speed)
-//          let cityName = WeatherInfo.init(json: json)
-//          print(cityName)
-//          let temperature = WeatherInfo.init(json: json)
-//          print(temperature)
-
-//          let cityName = json["name"].stringValue
-//          let temperature = json["main"]["temp"].doubleValue
-          //        let iconID = json["weather"][0]["icon"].stringValue
-
-//          self.tempTemperaure.append(temperature)
-
-
-//          print(cityName)
-//          print(temperature)
-//          print(cityName)
-
-
+        case.success(let data):
+          guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
+          self.weatherInfos.append(weatherInfo)
+          print(self.weatherInfos)
         case .failure(let error):
           print(error)
         }

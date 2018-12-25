@@ -10,6 +10,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   let cellIdentifier = "weatherDisplayCell"
 
+  var cityArr: [String] = [String]()
   var weatherInfos = [WeatherInfo]()
   var weatherDic = [String: Any]()
   var weather = [[String: Any]]()
@@ -21,9 +22,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   var tempSelectedCityArr: [String] = [String]()
   var selectedCity: [String] = []
-
-  // Properties below this line undecide yet let or var
-//  var tempTemperaure: [Double] = [Double]()
   let tempImageName = "01d"
 
   @IBOutlet weak var tableView: UITableView!
@@ -35,15 +33,33 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     print("successfully unwined form search city view Controller")
   }
 
-//  override func viewDidLoad() {
-//    super.viewDidLoad()
-//    getWeather()
-//  }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    DispatchQueue.main.async {
+      self.getCityList()
+    }
+  }
 
 //  override func viewWillAppear(_ animated: Bool) {
 //    super.viewWillAppear(animated)
 //    getWeather()
 //  }
+
+  // when and how to make fast loading...?
+  func getCityList() {
+    if let asset = NSDataAsset(name: "cityList", bundle: Bundle.main) {
+      do {
+        //        let json = try? JSONSerialization.jsonObject(with: asset.data, options: JSONSerialization.ReadingOptions.allowFragments)
+        if let json = try? JSONSerialization.jsonObject(with: asset.data, options: []) as! [[String: Any]] {
+          for city in json {
+            let a = city["name"] as! String
+            cityArr.append(a)
+            print(a)
+          }
+        }
+      }
+    }
+  }
 
   func getWeather() {
     
@@ -74,8 +90,15 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: self.cellIdentifier, for: indexPath) as! MainViewCell
     cell.cityLabel.text = self.selectedCity[indexPath.row]
-//    cell.temperatureLabel.text = String(self.tempTemperaure[indexPath.row])
     cell.conditionImageView.image = UIImage(named: tempImageName)
     return cell
+  }
+
+  //   MARK: - Navigation
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == "serchCitySegue" {
+      let dest = segue.destination as! SearchCityViewController
+      dest.cityArr = cityArr
+    }
   }
 }

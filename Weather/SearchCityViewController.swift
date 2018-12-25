@@ -3,6 +3,7 @@ import Foundation
 
 class SearchCityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchResultsUpdating {
 
+  // MARK: - Properties
   let cellIdentifier = "serchedCityDisplayCell"
   let unwindSegueIdentifier = "unwindToMainViewSegue"
   let searchController = UISearchController(searchResultsController: nil)
@@ -13,11 +14,6 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   var selectedIndextPath: IndexPath!
 
   @IBOutlet weak var tableView: UITableView!
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    setSearchController()
-  }
 
   // MARK: - Methods
   // MARK: SearchController Method

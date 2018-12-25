@@ -5,9 +5,9 @@ import CoreLocation
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+  // MARK: - Properties
   private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/weather?q="
   private let openWeatherMapAPIKey = "&APPID=4c8b3b461a4559a8ac0c397de4b3aaaf"
-
   let cellIdentifier = "weatherDisplayCell"
 
   var cityArr: [String] = [String]()
@@ -24,8 +24,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   var selectedCity: [String] = []
   let tempImageName = "01d"
 
+  
   @IBOutlet weak var tableView: UITableView!
 
+  // MARK: - Methods
   @IBAction func unwindFromSearchCityView(_ segue: UIStoryboardSegue) {
     tableView.reloadData()
     getWeather()
@@ -40,16 +42,9 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
   }
 
-//  override func viewWillAppear(_ animated: Bool) {
-//    super.viewWillAppear(animated)
-//    getWeather()
-//  }
-
-  // when and how to make fast loading...?
   func getCityList() {
     if let asset = NSDataAsset(name: "cityList", bundle: Bundle.main) {
       do {
-        //        let json = try? JSONSerialization.jsonObject(with: asset.data, options: JSONSerialization.ReadingOptions.allowFragments)
         if let json = try? JSONSerialization.jsonObject(with: asset.data, options: []) as! [[String: Any]] {
           for city in json {
             let a = city["name"] as! String

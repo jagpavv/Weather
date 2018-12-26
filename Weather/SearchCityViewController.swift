@@ -11,11 +11,15 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   var cityArr: [String]?
   var filteredCity = [String]()
   var selectedCity: String!
-  var selectedIndextPath: IndexPath!
 
   @IBOutlet weak var tableView: UITableView!
 
   // MARK: - Methods
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    setSearchController()
+  }
+
   // MARK: SearchController Method
   func setSearchController() {
     searchController.searchBar.delegate = self
@@ -43,7 +47,7 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
     dismiss(animated: true, completion: nil)
   }
 
-  // MARK: TableView Methods
+  // MARK: - TableView Methods
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return filteredCity.count
   }
@@ -66,8 +70,7 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
     if segue.identifier == unwindSegueIdentifier {
       guard let selectedCity = self.selectedCity else { return }
       let dest = segue.destination as! MainViewController
-      dest.selectedCity.append(selectedCity)
-      print("MainVC.tempCityArr: \(dest.selectedCity)")
+      dest.save(name: selectedCity)
     }
   }
 }

@@ -20,7 +20,7 @@
 		ACF1651521D18C450078DAFF /* Clouds.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF1651421D18C450078DAFF /* Clouds.swift */; };
 		ACF543F321CBB832004F9263 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF543F221CBB832004F9263 /* AppDelegate.swift */; };
 		ACF543F821CBB832004F9263 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ACF543F621CBB832004F9263 /* Main.storyboard */; };
-		ACF543FB21CBB832004F9263 /* Weather.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACF543F921CBB832004F9263 /* Weather.xcdatamodeld */; };
+		ACF543FB21CBB832004F9263 /* SelectedCity.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ACF543F921CBB832004F9263 /* SelectedCity.xcdatamodeld */; };
 		ACF543FD21CBB834004F9263 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ACF543FC21CBB834004F9263 /* Assets.xcassets */; };
 		ACF5440021CBB834004F9263 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ACF543FE21CBB834004F9263 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -121,7 +121,7 @@
 				ACF543FC21CBB834004F9263 /* Assets.xcassets */,
 				ACF543FE21CBB834004F9263 /* LaunchScreen.storyboard */,
 				ACF5440121CBB834004F9263 /* Info.plist */,
-				ACF543F921CBB832004F9263 /* Weather.xcdatamodeld */,
+				ACF543F921CBB832004F9263 /* SelectedCity.xcdatamodeld */,
 			);
 			path = Weather;
 			sourceTree = "<group>";
@@ -242,7 +242,7 @@
 			files = (
 				ACF1650421CF13E00078DAFF /* WeatherInfo.swift in Sources */,
 				ACF1650D21D180800078DAFF /* Wind.swift in Sources */,
-				ACF543FB21CBB832004F9263 /* Weather.xcdatamodeld in Sources */,
+				ACF543FB21CBB832004F9263 /* SelectedCity.xcdatamodeld in Sources */,
 				ACF1650F21D183200078DAFF /* Weather.swift in Sources */,
 				ACF1650A21D141810078DAFF /* Main.swift in Sources */,
 				ACF164F821CE3FA70078DAFF /* MainViewCell.swift in Sources */,
@@ -455,13 +455,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		ACF543F921CBB832004F9263 /* Weather.xcdatamodeld */ = {
+		ACF543F921CBB832004F9263 /* SelectedCity.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
 				ACF543FA21CBB832004F9263 /* Weather.xcdatamodel */,
 			);
 			currentVersion = ACF543FA21CBB832004F9263 /* Weather.xcdatamodel */;
-			path = Weather.xcdatamodeld;
+			path = SelectedCity.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

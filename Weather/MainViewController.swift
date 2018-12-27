@@ -33,7 +33,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    OperationQueue().addOperation {
+    DispatchQueue.main.async {
       self.getCityList()
     }
   }
@@ -46,7 +46,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       let city = v.value(forKey: "name") as! String
       getWeather(from: city)
       print("city, fetch from CoreData \(city)")
-      tableView.reloadData()
     }
   }
 

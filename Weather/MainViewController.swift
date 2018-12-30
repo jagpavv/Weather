@@ -36,7 +36,19 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   private var cityList = [String]()
   private var weatherInfos = [WeatherInfo]()
-  var selectedCities = [String]()
+  var selectedCities: [String] {
+    get {
+      var cities = [String]()
+      if let city = UserDefaults.standard.stringArray(forKey: kSelectedCitiesKey) {
+        cities = city
+      }
+      return cities
+    }
+    set {
+      UserDefaults.standard.set(newValue, forKey: kSelectedCitiesKey)
+      UserDefaults.standard.synchronize()
+    }
+  }
 
   private lazy var jsonDecoder: JSONDecoder = {
     let decoder = JSONDecoder()
@@ -50,11 +62,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
-    if let cities = UserDefaults.standard.stringArray(forKey: kSelectedCitiesKey) {
-      selectedCities = cities
-      print(selectedCities)
-    }
     self.getCityList()
   }
 
@@ -122,8 +129,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     if editingStyle == .delete {
       self.selectedCities.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .right)
-      UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
-      UserDefaults.standard.synchronize()
       tableView.reloadData()
     }
   }
@@ -135,5 +140,4 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       dest?.delegate = self
     }
   }
-
 }

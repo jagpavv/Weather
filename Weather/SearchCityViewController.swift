@@ -1,16 +1,20 @@
 import UIKit
 import Foundation
 
+protocol SearchCityDelegate {
+//  var searchCityList: [String]? { get }
+  func searchCityList() -> [String]?
+  func searchCitySelected(city: String)
+}
+
 class SearchCityViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchResultsUpdating {
 
   // MARK: - Properties
   let cellIdentifier = "serchedCityDisplayCell"
-  let unwindSegueIdentifier = "unwindToMainViewSegue"
   let searchController = UISearchController(searchResultsController: nil)
 
-  var cityArr: [String]?
+  var delegate: SearchCityDelegate?
   var filteredCity = [String]()
-  var selectedCity: String!
 
   @IBOutlet weak var tableView: UITableView!
 
@@ -33,9 +37,9 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   }
 
   func updateSearchResults(for searchController: UISearchController) {
-    guard let cityArr = cityArr else { return }
+    guard let cityList = delegate?.searchCityList() else { return }
     if let searchText = searchController.searchBar.text, !searchText.isEmpty {
-      filteredCity = cityArr.filter { city in
+      filteredCity = cityList.filter { city in
         return city.lowercased().contains(searchText.lowercased())
       }
     }
@@ -60,17 +64,8 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let selectedText = tableView.cellForRow(at: indexPath)?.textLabel?.text else { return }
-    selectedCity = selectedText
-    performSegue(withIdentifier: unwindSegueIdentifier, sender: self)
     print("selectedText: \(selectedText)")
-  }
-
-  //   MARK: - Navigation
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == unwindSegueIdentifier {
-      guard let selectedCity = self.selectedCity else { return }
-      let dest = segue.destination as! MainViewController
-      dest.save(name: selectedCity)
-    }
+    delegate?.searchCitySelected(city: selectedText)
+    dismiss(animated: true)
   }
 }

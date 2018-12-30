@@ -12,17 +12,12 @@ extension Date {
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SearchCityDelegate {
 
-  func searchCityList() -> [String]? {
-    return cityList
+  struct My {
+    static var cellSnapShot: UIView? = nil
   }
 
-  func searchCitySelected(city: String) {
-    guard !selectedCities.contains(city) else { return }
-    selectedCities.append(city)
-    tableView.reloadData()
-    UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
-    UserDefaults.standard.synchronize()
-    print("searchCitySelected \(selectedCities)")
+  struct Path {
+    static var initialIndexPath: IndexPath? = nil
   }
 
   // MARK: - Properties
@@ -72,6 +67,19 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   }
 
   // MARK: - Methods
+  func searchCityList() -> [String]? {
+    return cityList
+  }
+
+  func searchCitySelected(city: String) {
+    guard !selectedCities.contains(city) else { return }
+    selectedCities.append(city)
+    tableView.reloadData()
+    UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
+    UserDefaults.standard.synchronize()
+    print("searchCitySelected \(selectedCities)")
+  }
+
   private func getCityList() {
     let now = Date().millisecondsSince1970
 
@@ -204,14 +212,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     cellSnapShot.layer.shadowOffset = CGSize(width: -0.5, height: 0.0)
     cellSnapShot.layer.shadowOpacity = 0.4
     return cellSnapShot
-  }
-
-  struct My {
-    static var cellSnapShot: UIView? = nil
-  }
-
-  struct Path {
-    static var initialIndexPath: IndexPath? = nil
   }
 
   //   MARK: - Navigation

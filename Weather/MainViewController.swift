@@ -12,17 +12,12 @@ extension Date {
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SearchCityDelegate {
 
-  func searchCityList() -> [String]? {
-    return cityList
+  struct My {
+    static var cellSnapShot: UIView? = nil
   }
 
-  func searchCitySelected(city: String) {
-    guard !selectedCities.contains(city) else { return }
-    selectedCities.append(city)
-    tableView.reloadData()
-    UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
-    UserDefaults.standard.synchronize()
-    print("searchCitySelected \(selectedCities)")
+  struct Path {
+    static var initialIndexPath: IndexPath? = nil
   }
 
   // MARK: - Properties
@@ -36,7 +31,19 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   private var cityList = [String]()
   private var weatherInfos = [WeatherInfo]()
-  var selectedCities = [String]()
+  var selectedCities: [String] {
+    get {
+      var cities = [String]()
+      if let city = UserDefaults.standard.stringArray(forKey: kSelectedCitiesKey) {
+        cities = city
+      }
+      return cities
+    }
+    set {
+      UserDefaults.standard.set(newValue, forKey: kSelectedCitiesKey)
+      UserDefaults.standard.synchronize()
+    }
+  }
 
   private lazy var jsonDecoder: JSONDecoder = {
     let decoder = JSONDecoder()
@@ -50,16 +57,27 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
-    if let cities = UserDefaults.standard.stringArray(forKey: kSelectedCitiesKey) {
-      selectedCities = cities
-      print(selectedCities)
-    }
     self.getCityList()
+    let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
+    self.tableView.addGestureRecognizer(longpress)
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+  }
+
+  // MARK: - Methods
+  func searchCityList() -> [String]? {
+    return cityList
+  }
+
+  func searchCitySelected(city: String) {
+    guard !selectedCities.contains(city) else { return }
+    selectedCities.append(city)
+    tableView.reloadData()
+    UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
+    UserDefaults.standard.synchronize()
+    print("searchCitySelected \(selectedCities)")
   }
 
   private func getCityList() {
@@ -114,6 +132,88 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     return cell
   }
 
+  func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    return true
+  }
+
+  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    if editingStyle == .delete {
+      self.selectedCities.remove(at: indexPath.row)
+      tableView.deleteRows(at: [indexPath], with: .right)
+      tableView.reloadData()
+    }
+  }
+  // add recognizer -> addTarget (target-action pattern) -> state object's current state
+  @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
+    let longpress = gestureRecognizer as! UILongPressGestureRecognizer
+    let state = longpress.state
+    let locationInView = longpress.location(in: self.tableView)
+    let indexPath = self.tableView.indexPathForRow(at: locationInView)
+
+    switch state {
+    case .began:
+      if indexPath != nil {
+        Path.initialIndexPath = indexPath
+        let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
+        My.cellSnapShot = snapshopOfCell(inputView: cell)
+        var center = cell.center
+        My.cellSnapShot?.center = center
+        My.cellSnapShot?.alpha = 0.0
+        self.tableView.addSubview(My.cellSnapShot!)
+
+        UIView.animate(withDuration: 0.25, animations: {
+          center.y = locationInView.y
+          My.cellSnapShot?.center = center
+          My.cellSnapShot?.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+          My.cellSnapShot?.alpha = 0.98
+          cell.alpha = 0.0
+        }, completion: { (finished) -> Void in
+          if finished {
+            cell.isHidden = true
+          }
+        })
+      }
+    case .changed:
+      var center = My.cellSnapShot?.center
+      center?.y = locationInView.y
+      My.cellSnapShot?.center = center!
+      if (indexPath != nil && indexPath != Path.initialIndexPath) {
+        self.selectedCities.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+        self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
+        Path.initialIndexPath = indexPath
+      }
+    default:
+      let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
+      cell.isHidden = false
+      cell.alpha = 0.0
+      UIView.animate(withDuration: 0.25, animations: {
+        My.cellSnapShot?.center = cell.center
+        My.cellSnapShot?.transform = .identity
+        My.cellSnapShot?.alpha = 0.0
+        cell.alpha = 1.0
+      }, completion: { (finished) -> Void in
+        if finished {
+          Path.initialIndexPath = nil
+          My.cellSnapShot?.removeFromSuperview()
+          My.cellSnapShot = nil
+        }
+      })
+    }
+  }
+
+  func snapshopOfCell(inputView: UIView) -> UIView {
+    UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
+    inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
+    let image = UIGraphicsGetImageFromCurrentImageContext()!
+    UIGraphicsEndImageContext()
+    let cellSnapShot: UIView = UIImageView(image: image)
+    cellSnapShot.layer.masksToBounds = false
+    cellSnapShot.layer.cornerRadius = 0.0
+    cellSnapShot.layer.shadowOffset = CGSize(width: -0.5, height: 0.0)
+    cellSnapShot.layer.shadowOpacity = 0.4
+    return cellSnapShot
+  }
+
   //   MARK: - Navigation
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     if segue.identifier == "serchCitySegue" {
@@ -121,5 +221,4 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       dest?.delegate = self
     }
   }
-
 }

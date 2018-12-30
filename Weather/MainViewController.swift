@@ -63,12 +63,15 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   override func viewDidLoad() {
     super.viewDidLoad()
     self.getCityList()
+    let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
+    self.tableView.addGestureRecognizer(longpress)
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
   }
 
+  // MARK: - Methods
   private func getCityList() {
     let now = Date().millisecondsSince1970
 
@@ -131,6 +134,84 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       tableView.deleteRows(at: [indexPath], with: .right)
       tableView.reloadData()
     }
+  }
+  // add recognizer -> addTarget (target-action pattern) -> state object's current state
+  @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
+    let longpress = gestureRecognizer as! UILongPressGestureRecognizer
+    let state = longpress.state
+    let locationInView = longpress.location(in: self.tableView)
+    let indexPath = self.tableView.indexPathForRow(at: locationInView)
+
+    switch state {
+    case .began:
+      if indexPath != nil {
+        Path.initialIndexPath = indexPath
+        let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
+        My.cellSnapShot = snapshopOfCell(inputView: cell)
+        var center = cell.center
+        My.cellSnapShot?.center = center
+        My.cellSnapShot?.alpha = 0.0
+        self.tableView.addSubview(My.cellSnapShot!)
+
+        UIView.animate(withDuration: 0.25, animations: {
+          center.y = locationInView.y
+          My.cellSnapShot?.center = center
+          My.cellSnapShot?.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+          My.cellSnapShot?.alpha = 0.98
+          cell.alpha = 0.0
+        }, completion: { (finished) -> Void in
+          if finished {
+            cell.isHidden = true
+          }
+        })
+      }
+    case .changed:
+      var center = My.cellSnapShot?.center
+      center?.y = locationInView.y
+      My.cellSnapShot?.center = center!
+      if (indexPath != nil && indexPath != Path.initialIndexPath) {
+        self.selectedCities.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+        self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
+        Path.initialIndexPath = indexPath
+      }
+    default:
+      let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
+      cell.isHidden = false
+      cell.alpha = 0.0
+      UIView.animate(withDuration: 0.25, animations: {
+        My.cellSnapShot?.center = cell.center
+        My.cellSnapShot?.transform = .identity
+        My.cellSnapShot?.alpha = 0.0
+        cell.alpha = 1.0
+      }, completion: { (finished) -> Void in
+        if finished {
+          Path.initialIndexPath = nil
+          My.cellSnapShot?.removeFromSuperview()
+          My.cellSnapShot = nil
+        }
+      })
+    }
+  }
+
+  func snapshopOfCell(inputView: UIView) -> UIView {
+    UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
+    inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
+    let image = UIGraphicsGetImageFromCurrentImageContext()!
+    UIGraphicsEndImageContext()
+    let cellSnapShot: UIView = UIImageView(image: image)
+    cellSnapShot.layer.masksToBounds = false
+    cellSnapShot.layer.cornerRadius = 0.0
+    cellSnapShot.layer.shadowOffset = CGSize(width: -0.5, height: 0.0)
+    cellSnapShot.layer.shadowOpacity = 0.4
+    return cellSnapShot
+  }
+
+  struct My {
+    static var cellSnapShot: UIView? = nil
+  }
+
+  struct Path {
+    static var initialIndexPath: IndexPath? = nil
   }
 
   //   MARK: - Navigation

@@ -16,6 +16,7 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
   var delegate: SearchCityDelegate?
   var filteredCity = [String]()
 
+  // MARK: - IBOutlets
   @IBOutlet weak var tableView: UITableView!
 
   // MARK: - Methods
@@ -64,6 +65,7 @@ class SearchCityViewController: UIViewController, UITableViewDataSource, UITable
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let selectedText = tableView.cellForRow(at: indexPath)?.textLabel?.text else { return }
+    
     print("selectedText: \(selectedText)")
     delegate?.searchCitySelected(city: selectedText)
     dismiss(animated: true)

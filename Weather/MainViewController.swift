@@ -27,7 +27,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   private let kSelectedCitiesKey = "SelectedCities"
   private let kCityListKey = "cityList"
 
-
   private var cityList = [String]()
   var weatherInfos = [WeatherInfo]()
   private lazy var jsonDecoder: JSONDecoder = {
@@ -49,19 +48,22 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
   }
 
+  // MARK: - IBOutlets
   @IBOutlet weak var addButton: UIButton!
   @IBOutlet weak var tableView: UITableView!
 
+  // MARK: - Methods
   override func viewDidLoad() {
     super.viewDidLoad()
-    self.getCityList()
     let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
+
+    self.getCityList()
     self.tableView.addGestureRecognizer(longpress)
 
-      for city in self.selectedCities {
-        print("selected city \(selectedCities)")
-        self.getWeather(from: city)
-      }
+    for city in self.selectedCities {
+      print("selected city \(selectedCities)")
+      self.getWeather(from: city)
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -72,7 +74,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     super.viewDidAppear(animated)
   }
 
-  // MARK: - Methods
   // MARK: - SearchCityDelegate Methods
   func searchCityList() -> [String]? {
     return cityList
@@ -80,6 +81,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   func searchCitySelected(city: String) {
     guard !selectedCities.contains(city) else { return }
+
     selectedCities.append(city)
     tableView.reloadData()
     UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
@@ -112,7 +114,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   }
 
   private func getWeather(from city: String) {
-    let url = openWeatherMapBaseURL + city + openWeatherMapAPIKey
+    guard let cityName = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
+
+    let url = openWeatherMapBaseURL + cityName + openWeatherMapAPIKey
+    print("cityName \(cityName)")
     print(url)
 
     Alamofire.request(url, method: .get).validate().responseData { response in
@@ -120,10 +125,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       case.success(let data):
         guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
         self.weatherInfos.append(weatherInfo)
-//        print("weatherInfo.name \(weatherInfo.name)")
+        //        print("weatherInfo.name \(weatherInfo.name)")
         self.tableView.reloadData()
-//        dump(self.weatherInfos)
-//        print("weatherInfos.count append \(self.weatherInfos.count)")
+        //        dump(self.weatherInfos)
+      //        print("weatherInfos.count append \(self.weatherInfos.count)")
       case .failure(let error):
         print(error)
       }
@@ -219,6 +224,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
     let image = UIGraphicsGetImageFromCurrentImageContext()!
     UIGraphicsEndImageContext()
+
     let cellSnapShot: UIView = UIImageView(image: image)
     cellSnapShot.layer.masksToBounds = false
     cellSnapShot.layer.cornerRadius = 0.0

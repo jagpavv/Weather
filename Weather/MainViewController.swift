@@ -121,6 +121,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   }
 
   // MARK: - Tableview Methods
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    return CGFloat(200)
+  }
+
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return selectedCities.count
   }
@@ -216,7 +220,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   //   MARK: - Navigation
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == "serchCitySegue" {
+    if segue.identifier == "searchCitySegue" {
       let dest = segue.destination as? SearchCityViewController
       dest?.delegate = self
     }

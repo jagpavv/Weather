@@ -6,13 +6,11 @@ class MainViewCell: UITableViewCell {
   @IBOutlet weak var temperatureLabel: UILabel!
   @IBOutlet weak var conditionImageView: UIImageView!
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+  func fillCell(data: WeatherInfo) {
+    self.cityLabel.text = data.name
+    self.temperatureLabel.text = String(data.main.temp.rounded())
+    if let iconId = data.weather?[0].icon {
+      self.conditionImageView.image = UIImage(named: iconId)
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        // Configure the view for the selected state
-    }
+  }
 }

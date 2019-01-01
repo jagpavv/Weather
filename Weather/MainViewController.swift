@@ -27,10 +27,14 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   private let kSelectedCitiesKey = "SelectedCities"
   private let kCityListKey = "cityList"
 
-  @IBOutlet weak var addButton: UIButton!
 
   private var cityList = [String]()
-  private var weatherInfos = [WeatherInfo]()
+  var weatherInfos = [WeatherInfo]()
+  private lazy var jsonDecoder: JSONDecoder = {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return decoder
+  }()
   var selectedCities: [String] {
     get {
       var cities = [String]()
@@ -45,14 +49,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
   }
 
-  private lazy var jsonDecoder: JSONDecoder = {
-    let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
-    return decoder
-  }()
-
-  private let tempImageName = "01d"
-
+  @IBOutlet weak var addButton: UIButton!
   @IBOutlet weak var tableView: UITableView!
 
   override func viewDidLoad() {
@@ -60,13 +57,23 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     self.getCityList()
     let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
     self.tableView.addGestureRecognizer(longpress)
+
+      for city in self.selectedCities {
+        print("selected city \(selectedCities)")
+        self.getWeather(from: city)
+      }
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
   }
 
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+  }
+
   // MARK: - Methods
+  // MARK: - SearchCityDelegate Methods
   func searchCityList() -> [String]? {
     return cityList
   }
@@ -80,6 +87,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     print("searchCitySelected \(selectedCities)")
   }
 
+  // MARK: - Parsing data Methods
   private func getCityList() {
     let now = Date().millisecondsSince1970
 
@@ -112,8 +120,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       case.success(let data):
         guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
         self.weatherInfos.append(weatherInfo)
+//        print("weatherInfo.name \(weatherInfo.name)")
         self.tableView.reloadData()
-        dump(self.weatherInfos)
+//        dump(self.weatherInfos)
+//        print("weatherInfos.count append \(self.weatherInfos.count)")
       case .failure(let error):
         print(error)
       }
@@ -121,14 +131,17 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   }
 
   // MARK: - Tableview Methods
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    return CGFloat(200)
+  }
+
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return selectedCities.count
+    return weatherInfos.count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: self.cellIdentifier, for: indexPath) as! MainViewCell
-    cell.cityLabel?.text = selectedCities[indexPath.row]
-    cell.conditionImageView.image = UIImage(named: tempImageName)
+    cell.fillCell(data: weatherInfos[indexPath.row])
     return cell
   }
 
@@ -143,7 +156,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
       tableView.reloadData()
     }
   }
-  // add recognizer -> addTarget (target-action pattern) -> state object's current state
+
   @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
     let longpress = gestureRecognizer as! UILongPressGestureRecognizer
     let state = longpress.state
@@ -216,7 +229,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
   //   MARK: - Navigation
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == "serchCitySegue" {
+    if segue.identifier == "searchCitySegue" {
       let dest = segue.destination as? SearchCityViewController
       dest?.delegate = self
     }

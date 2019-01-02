@@ -26,11 +26,11 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Button"/>
                                     <connections>
-                                        <segue destination="6MM-7K-Wff" kind="presentation" identifier="searchCitySegue" id="puS-pn-7mN"/>
+                                        <segue destination="6MM-7K-Wff" kind="presentation" identifier="searchCitySegue" id="mAT-ao-X2r"/>
                                     </connections>
                                 </button>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="weatherDisplayCell" rowHeight="170" id="d5T-RZ-4Mj" customClass="MainViewCell" customModule="Weather" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MainViewCell" rowHeight="170" id="d5T-RZ-4Mj" customClass="MainViewCell" customModule="Weather" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="414" height="170"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="d5T-RZ-4Mj" id="QIq-bT-kT7">
@@ -104,8 +104,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <searchBar contentMode="redraw" showsCancelButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QUT-pn-i7P">
+                                <rect key="frame" x="0.0" y="44" width="414" height="56"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="6MM-7K-Wff" id="t4f-aX-GSn"/>
+                                </connections>
+                            </searchBar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="81h-bQ-6Hn">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <rect key="frame" x="0.0" y="100" width="414" height="796"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="serchedCityDisplayCell" textLabel="p6q-Kl-XqI" rowHeight="127" style="IBUITableViewCellStyleDefault" id="MDj-k0-Bet">
@@ -134,20 +141,24 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="81h-bQ-6Hn" firstAttribute="top" secondItem="oVi-Ep-U08" secondAttribute="top" id="D7w-rU-VLv"/>
+                            <constraint firstItem="QUT-pn-i7P" firstAttribute="width" secondItem="6QE-Mv-wcp" secondAttribute="width" id="24C-fc-Tgu"/>
+                            <constraint firstItem="81h-bQ-6Hn" firstAttribute="top" secondItem="QUT-pn-i7P" secondAttribute="bottom" id="D7w-rU-VLv"/>
+                            <constraint firstItem="QUT-pn-i7P" firstAttribute="leading" secondItem="oVi-Ep-U08" secondAttribute="leading" id="Eyb-EU-QUu"/>
                             <constraint firstAttribute="bottom" secondItem="81h-bQ-6Hn" secondAttribute="bottom" id="j2r-sr-j3X"/>
+                            <constraint firstItem="QUT-pn-i7P" firstAttribute="top" secondItem="6QE-Mv-wcp" secondAttribute="top" id="oQt-RL-SiN"/>
                             <constraint firstItem="81h-bQ-6Hn" firstAttribute="trailing" secondItem="6QE-Mv-wcp" secondAttribute="trailing" id="qzf-AC-yCb"/>
                             <constraint firstItem="81h-bQ-6Hn" firstAttribute="leading" secondItem="6QE-Mv-wcp" secondAttribute="leading" id="tQM-lp-1gZ"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6QE-Mv-wcp"/>
                     </view>
+                    <navigationItem key="navigationItem" id="ukj-6t-6J0"/>
                     <connections>
-                        <outlet property="tableView" destination="81h-bQ-6Hn" id="Blj-Iy-Lmv"/>
+                        <outlet property="tableView" destination="81h-bQ-6Hn" id="5mB-Pg-HOt"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wJo-G7-Kqg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1679.7101449275362" y="724.55357142857144"/>
+            <point key="canvasLocation" x="1703" y="725"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="LKb-aB-oBh">

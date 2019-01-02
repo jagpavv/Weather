@@ -10,7 +10,7 @@ extension Date {
   }
 }
 
-class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SearchCityDelegate {
+class MainViewController: UIViewController {
 
   struct My {
     static var cellSnapShot: UIView? = nil
@@ -20,21 +20,19 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     static var initialIndexPath: IndexPath? = nil
   }
 
-  // MARK: - Properties
   private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/weather?q="
   private let openWeatherMapAPIKey = "&APPID=4c8b3b461a4559a8ac0c397de4b3aaaf"
-  private let cellIdentifier = "weatherDisplayCell"
   private let kSelectedCitiesKey = "SelectedCities"
   private let kCityListKey = "cityList"
 
+  private var weatherInfos = [WeatherInfo]()
   private var cityList = [String]()
-  var weatherInfos = [WeatherInfo]()
   private lazy var jsonDecoder: JSONDecoder = {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
   }()
-  var selectedCities: [String] {
+  private var selectedCities: [String] {
     get {
       var cities = [String]()
       if let city = UserDefaults.standard.stringArray(forKey: kSelectedCitiesKey) {
@@ -48,45 +46,20 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
   }
 
-  // MARK: - IBOutlets
   @IBOutlet weak var addButton: UIButton!
   @IBOutlet weak var tableView: UITableView!
 
-  // MARK: - Methods
+  // MARK: - View life cycle
   override func viewDidLoad() {
     super.viewDidLoad()
     let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
 
-    self.getCityList()
-    self.tableView.addGestureRecognizer(longpress)
+    getCityList()
+    tableView.addGestureRecognizer(longpress)
 
-    for city in self.selectedCities {
-      print("selected city \(selectedCities)")
+    selectedCities.forEach { city in
       self.getWeather(from: city)
     }
-  }
-
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-  }
-
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-  }
-
-  // MARK: - SearchCityDelegate Methods
-  func searchCityList() -> [String]? {
-    return cityList
-  }
-
-  func searchCitySelected(city: String) {
-    guard !selectedCities.contains(city) else { return }
-
-    selectedCities.append(city)
-    tableView.reloadData()
-    UserDefaults.standard.set(selectedCities, forKey: kSelectedCitiesKey)
-    UserDefaults.standard.synchronize()
-    print("searchCitySelected \(selectedCities)")
   }
 
   // MARK: - Parsing data Methods
@@ -114,51 +87,24 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
   }
 
   private func getWeather(from city: String) {
+    print("getWeather (from: \(city))")
     guard let cityName = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
 
     let url = openWeatherMapBaseURL + cityName + openWeatherMapAPIKey
-    print("cityName \(cityName)")
     print(url)
 
     Alamofire.request(url, method: .get).validate().responseData { response in
       switch response.result {
       case.success(let data):
         guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
+
         self.weatherInfos.append(weatherInfo)
-        //        print("weatherInfo.name \(weatherInfo.name)")
+        print("Got response from API : \(weatherInfo.name)")
         self.tableView.reloadData()
-        //        dump(self.weatherInfos)
-      //        print("weatherInfos.count append \(self.weatherInfos.count)")
+      //        dump(self.weatherInfos)
       case .failure(let error):
         print(error)
       }
-    }
-  }
-
-  // MARK: - Tableview Methods
-  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    return CGFloat(200)
-  }
-
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return weatherInfos.count
-  }
-
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: self.cellIdentifier, for: indexPath) as! MainViewCell
-    cell.fillCell(data: weatherInfos[indexPath.row])
-    return cell
-  }
-
-  func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return true
-  }
-
-  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-    if editingStyle == .delete {
-      self.selectedCities.remove(at: indexPath.row)
-      tableView.deleteRows(at: [indexPath], with: .right)
-      tableView.reloadData()
     }
   }
 
@@ -238,6 +184,50 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     if segue.identifier == "searchCitySegue" {
       let dest = segue.destination as? SearchCityViewController
       dest?.delegate = self
+    }
+  }
+}
+
+// MARK: - SearchCityDelegate
+extension MainViewController: SearchCityDelegate {
+
+  var searchCityList: [String]? {
+    return cityList
+  }
+
+  func searchCitySelected(city: String) {
+    guard !selectedCities.contains(city) else { return }
+
+    selectedCities.append(city)
+    getWeather(from: city)
+  }
+}
+
+// MARK: - UITableViewDataSource, UITableViewDelegate
+extension MainViewController: UITableViewDataSource, UITableViewDelegate {
+  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    return CGFloat(200)
+  }
+
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return weatherInfos.count
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: MainViewCell.identifier, for: indexPath) as! MainViewCell
+    cell.fillCell(data: weatherInfos[indexPath.row])
+    return cell
+  }
+
+  func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    return true
+  }
+
+  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    if editingStyle == .delete {
+      self.selectedCities.remove(at: indexPath.row)
+      tableView.deleteRows(at: [indexPath], with: .right)
+      tableView.reloadData()
     }
   }
 }

@@ -26,7 +26,7 @@ class MainViewController: UIViewController {
   private let kCityListKey = "cityList"
 
   private var weatherInfos = [WeatherInfo]()
-  private var cityList = [String]()
+  private var cityList = [City]()
   private lazy var jsonDecoder: JSONDecoder = {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -60,24 +60,31 @@ class MainViewController: UIViewController {
     selectedCities.forEach { city in
       self.getWeather(from: city)
     }
+
+    let city: Int = Int()
+    let city1 = City(id: 1, name: "Berlin", country: "DE")
+    let city2 = City(id: 2, name: "Paris", country: "FR")
+    let city3 = City(id: 3, name: "London", country: "GB")
+
   }
 
   // MARK: - Parsing data Methods
   private func getCityList() {
     let now = Date().millisecondsSince1970
 
-    if let cities = UserDefaults.standard.stringArray(forKey: kCityListKey) {
-      cityList = cities
+    if let citiesData = UserDefaults.standard.object(forKey: kCityListKey) as? Data {
+      cityList = try! NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(citiesData) as! [City]
       print("mili1: \(Date().millisecondsSince1970 - now)")
     } else if let asset = NSDataAsset(name: "cityList", bundle: Bundle.main) {
       do {
         if let json = try? JSONSerialization.jsonObject(with: asset.data, options: []) as! [[String: Any]] {
-          for city in json {
-            let name = city["name"] as! String
-            cityList.append(name)
+          for cityJson in json {
+            let city = City(json: cityJson)
+            cityList.append(city)
           }
           print("mili2: \(Date().millisecondsSince1970 - now)")
-          UserDefaults.standard.set(cityList, forKey: kCityListKey)
+          let encodedData: Data = try! NSKeyedArchiver.archivedData(withRootObject: cityList, requiringSecureCoding: false)
+          UserDefaults.standard.set(encodedData, forKey: kCityListKey)
           UserDefaults.standard.synchronize()
         }
       }
@@ -142,7 +149,7 @@ class MainViewController: UIViewController {
       center?.y = locationInView.y
       My.cellSnapShot?.center = center!
       if (indexPath != nil && indexPath != Path.initialIndexPath) {
-        self.selectedCities.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+        self.weatherInfos.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
         self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
         Path.initialIndexPath = indexPath
       }
@@ -191,11 +198,11 @@ class MainViewController: UIViewController {
 // MARK: - SearchCityDelegate
 extension MainViewController: SearchCityDelegate {
 
-  var searchCityList: [String]? {
+  var searchCityList: [City]? {
     return cityList
   }
 
-  func searchCitySelected(city: String) {
+  func searchCitySelected(city: City) {
     guard !selectedCities.contains(city) else { return }
 
     selectedCities.append(city)
@@ -225,7 +232,7 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
-      self.selectedCities.remove(at: indexPath.row)
+      self.weatherInfos.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .right)
       tableView.reloadData()
     }

@@ -2,8 +2,8 @@ import UIKit
 import Foundation
 
 protocol SearchCityDelegate {
-  var searchCityList: [String]? { get }
-  func searchCitySelected(city: String)
+  var searchCityList: [City]? { get }
+  func searchCitySelected(city: City)
 }
 
 class SearchCityViewController: UIViewController {
@@ -11,7 +11,7 @@ class SearchCityViewController: UIViewController {
   let cellIdentifier = "serchedCityDisplayCell"
 
   var delegate: SearchCityDelegate?
-  var filteredCity = [String]()
+  var filteredCity = [City]()
 
   @IBOutlet weak var tableView: UITableView!
 
@@ -31,7 +31,7 @@ extension SearchCityViewController: UISearchBarDelegate {
 
     if let searchText = searchBar.text, !searchText.isEmpty {
       filteredCity = cityList.filter { city in
-        return city.lowercased().contains(searchText.lowercased())
+        return city.name.lowercased().contains(searchText.lowercased())
       }
     }
     tableView.reloadData()
@@ -47,15 +47,13 @@ extension SearchCityViewController: UITableViewDataSource, UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: self.cellIdentifier, for: indexPath)
-    cell.textLabel?.text = filteredCity[indexPath.row]
+    let city = filteredCity[indexPath.row]
+    cell.textLabel?.text = city.name + ", " + city.country
     return cell
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let selectedText = tableView.cellForRow(at: indexPath)?.textLabel?.text else { return }
-
-    print("selectedText: \(selectedText)")
-    delegate?.searchCitySelected(city: selectedText)
+    delegate?.searchCitySelected(city: filteredCity[indexPath.row])
     dismiss(animated: true)
   }
 }

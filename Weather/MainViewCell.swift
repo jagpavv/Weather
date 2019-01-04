@@ -1,6 +1,7 @@
 import UIKit
 
 class MainViewCell: UITableViewCell {
+  static let identifier = String(describing: MainViewCell.self)
 
   @IBOutlet weak var cityLabel: UILabel!
   @IBOutlet weak var temperatureLabel: UILabel!

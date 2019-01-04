@@ -153,6 +153,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="ukj-6t-6J0"/>
                     <connections>
+                        <outlet property="searchBar" destination="QUT-pn-i7P" id="CFp-2j-mAq"/>
                         <outlet property="tableView" destination="81h-bQ-6Hn" id="5mB-Pg-HOt"/>
                     </connections>
                 </viewController>

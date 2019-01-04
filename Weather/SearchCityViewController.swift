@@ -3,7 +3,7 @@ import Foundation
 
 protocol SearchCityDelegate {
   var searchCityList: [City]? { get }
-  func searchCitySelected(city: City)
+  func searchCitySelected(cityID: Int)
 }
 
 class SearchCityViewController: UIViewController {
@@ -14,9 +14,11 @@ class SearchCityViewController: UIViewController {
   var filteredCity = [City]()
 
   @IBOutlet weak var tableView: UITableView!
+  @IBOutlet weak var searchBar: UISearchBar!
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    searchBar.becomeFirstResponder()
   }
 
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -40,9 +42,8 @@ extension SearchCityViewController: UISearchBarDelegate {
 
 // MARK:- UITableViewDataSource, UITableViewDelegate
 extension SearchCityViewController: UITableViewDataSource, UITableViewDelegate {
-
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return filteredCity.count
+    return searchBar.text?.isEmpty ?? true ? 0 : filteredCity.count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -53,7 +54,14 @@ extension SearchCityViewController: UITableViewDataSource, UITableViewDelegate {
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    delegate?.searchCitySelected(city: filteredCity[indexPath.row])
+    delegate?.searchCitySelected(cityID: filteredCity[indexPath.row].id)
     dismiss(animated: true)
+  }
+}
+
+extension SearchCityViewController: UIScrollViewDelegate {
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    guard searchBar.isFirstResponder else { return }
+    searchBar.resignFirstResponder()
   }
 }

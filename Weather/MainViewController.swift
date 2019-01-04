@@ -20,9 +20,9 @@ class MainViewController: UIViewController {
     static var initialIndexPath: IndexPath? = nil
   }
 
-  private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/weather?q="
+  private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/weather?id="
   private let openWeatherMapAPIKey = "&APPID=4c8b3b461a4559a8ac0c397de4b3aaaf"
-  private let kSelectedCitiesKey = "SelectedCities"
+  private let kSelectedCityIDsKey = "selectedCityIDs"
   private let kCityListKey = "cityList"
 
   private var weatherInfos = [WeatherInfo]()
@@ -32,16 +32,12 @@ class MainViewController: UIViewController {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
   }()
-  private var selectedCities: [String] {
+  private var selectedCityIDs: [Int] {
     get {
-      var cities = [String]()
-      if let city = UserDefaults.standard.stringArray(forKey: kSelectedCitiesKey) {
-        cities = city
-      }
-      return cities
+      return UserDefaults.standard.object(forKey: kSelectedCityIDsKey) as? [Int] ?? [Int]()
     }
     set {
-      UserDefaults.standard.set(newValue, forKey: kSelectedCitiesKey)
+      UserDefaults.standard.set(newValue, forKey: kSelectedCityIDsKey)
       UserDefaults.standard.synchronize()
     }
   }
@@ -57,15 +53,10 @@ class MainViewController: UIViewController {
     getCityList()
     tableView.addGestureRecognizer(longpress)
 
-    selectedCities.forEach { city in
-      self.getWeather(from: city)
+    print(selectedCityIDs)
+    selectedCityIDs.forEach { cityID in
+      self.getWeather(from: cityID)
     }
-
-    let city: Int = Int()
-    let city1 = City(id: 1, name: "Berlin", country: "DE")
-    let city2 = City(id: 2, name: "Paris", country: "FR")
-    let city3 = City(id: 3, name: "London", country: "GB")
-
   }
 
   // MARK: - Parsing data Methods
@@ -93,26 +84,47 @@ class MainViewController: UIViewController {
     print("cityList.count: \(cityList.count)")
   }
 
-  private func getWeather(from city: String) {
-    print("getWeather (from: \(city))")
-    guard let cityName = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
-
-    let url = openWeatherMapBaseURL + cityName + openWeatherMapAPIKey
-    print(url)
-
+  private func getWeather(from cityID: Int) {
+    let url = openWeatherMapBaseURL + "\(cityID)" + openWeatherMapAPIKey
+    //    print(url)
     Alamofire.request(url, method: .get).validate().responseData { response in
       switch response.result {
       case.success(let data):
         guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
-
         self.weatherInfos.append(weatherInfo)
-        print("Got response from API : \(weatherInfo.name)")
+        self.sort2()
+        print("Got response from API : \(weatherInfo.id)")
         self.tableView.reloadData()
-      //        dump(self.weatherInfos)
       case .failure(let error):
         print(error)
       }
     }
+  }
+
+  func sort2() {
+    weatherInfos = weatherInfos.sorted { selectedCityIDs.firstIndex(of: $0.id) ?? -1 < selectedCityIDs.firstIndex(of: $1.id) ?? -1 }
+  }
+
+  func sort() {
+
+    func findWeatherInfo(by cityID: Int) -> WeatherInfo? {
+      for info in weatherInfos {
+        if info.id == cityID {
+          return info
+        }
+      }
+      return nil
+    }
+
+    var sortedWeatehrInfos = [WeatherInfo]()
+
+    selectedCityIDs.forEach { (id) in
+      if let w = findWeatherInfo(by: id) {
+        sortedWeatehrInfos.append(w)
+      }
+    }
+
+    weatherInfos = sortedWeatehrInfos
   }
 
   @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
@@ -149,7 +161,7 @@ class MainViewController: UIViewController {
       center?.y = locationInView.y
       My.cellSnapShot?.center = center!
       if (indexPath != nil && indexPath != Path.initialIndexPath) {
-        self.weatherInfos.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+        self.selectedCityIDs.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
         self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
         Path.initialIndexPath = indexPath
       }
@@ -202,11 +214,11 @@ extension MainViewController: SearchCityDelegate {
     return cityList
   }
 
-  func searchCitySelected(city: City) {
-    guard !selectedCities.contains(city) else { return }
+  func searchCitySelected(cityID: Int) {
+    guard !selectedCityIDs.contains(cityID) else { return }
 
-    selectedCities.append(city)
-    getWeather(from: city)
+    selectedCityIDs.append(cityID)
+    getWeather(from: cityID)
   }
 }
 
@@ -232,7 +244,7 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
 
   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
-      self.weatherInfos.remove(at: indexPath.row)
+      self.selectedCityIDs.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .right)
       tableView.reloadData()
     }

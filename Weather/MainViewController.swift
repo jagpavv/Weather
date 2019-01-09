@@ -24,6 +24,8 @@ class MainViewController: UIViewController {
   private let openWeatherMapAPIKey = "&APPID=4c8b3b461a4559a8ac0c397de4b3aaaf"
   private let kSelectedCityIDsKey = "selectedCityIDs"
   private let kCityListKey = "cityList"
+  private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
+
 
   private var weatherInfos = [WeatherInfo]()
   private var cityList = [City]()
@@ -69,9 +71,8 @@ class MainViewController: UIViewController {
     } else if let asset = NSDataAsset(name: "cityList", bundle: Bundle.main) {
       do {
         if let json = try? JSONSerialization.jsonObject(with: asset.data, options: []) as! [[String: Any]] {
-          for cityJson in json {
-            let city = City(json: cityJson)
-            cityList.append(city)
+          json.forEach { (cityJson) in
+            cityList.append(City(json: cityJson))
           }
           print("mili2: \(Date().millisecondsSince1970 - now)")
           let encodedData: Data = try! NSKeyedArchiver.archivedData(withRootObject: cityList, requiringSecureCoding: false)
@@ -86,18 +87,24 @@ class MainViewController: UIViewController {
 
   private func getWeather(from cityID: Int) {
     let url = openWeatherMapBaseURL + "\(cityID)" + openWeatherMapAPIKey
+
     //    print(url)
     Alamofire.request(url, method: .get).validate().responseData { response in
+      self.startAnimatimgIndicator()
       switch response.result {
       case.success(let data):
         guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
+        print(data)
         self.weatherInfos.append(weatherInfo)
         self.sort2()
         print("Got response from API : \(weatherInfo.id)")
         self.tableView.reloadData()
+
       case .failure(let error):
         print(error)
       }
+      self.indicator.stopAnimating()
+      self.indicator.hidesWhenStopped = true
     }
   }
 
@@ -125,6 +132,13 @@ class MainViewController: UIViewController {
     }
 
     weatherInfos = sortedWeatehrInfos
+  }
+
+  func startAnimatimgIndicator() {
+    indicator.center = view.center
+    indicator.startAnimating()
+    indicator.hidesWhenStopped = false
+    view.addSubview(indicator)
   }
 
   @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
@@ -162,6 +176,7 @@ class MainViewController: UIViewController {
       My.cellSnapShot?.center = center!
       if (indexPath != nil && indexPath != Path.initialIndexPath) {
         self.selectedCityIDs.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+        self.weatherInfos.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
         self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
         Path.initialIndexPath = indexPath
       }
@@ -245,6 +260,7 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
       self.selectedCityIDs.remove(at: indexPath.row)
+      self.weatherInfos.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .right)
       tableView.reloadData()
     }

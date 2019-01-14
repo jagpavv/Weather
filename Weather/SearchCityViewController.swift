@@ -8,7 +8,9 @@ protocol SearchCityDelegate {
 
 class SearchCityViewController: UIViewController {
 
-  let cellIdentifier = "serchedCityDisplayCell"
+  private let cellIdentifier = "serchedCityDisplayCell"
+  private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
+
 
   var delegate: SearchCityDelegate?
   var filteredCity = [City]()
@@ -25,10 +27,18 @@ class SearchCityViewController: UIViewController {
     searchBar.text = ""
     dismiss(animated: true, completion: nil)
   }
+
+  func startAnimatimgIndicator() {
+    indicator.center = view.center
+    indicator.startAnimating()
+    indicator.hidesWhenStopped = false
+    view.addSubview(indicator)
+  }
 }
 
 extension SearchCityViewController: UISearchBarDelegate {
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    startAnimatimgIndicator()
     guard let cityList = delegate?.searchCityList else { return }
 
     if let searchText = searchBar.text, !searchText.isEmpty {
@@ -36,6 +46,9 @@ extension SearchCityViewController: UISearchBarDelegate {
         return city.name.lowercased().contains(searchText.lowercased())
       }
     }
+    self.indicator.stopAnimating()
+    self.indicator.hidesWhenStopped = true
+    self.indicator.removeFromSuperview()
     tableView.reloadData()
   }
 }

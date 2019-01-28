@@ -2,7 +2,8 @@ import UIKit
 import Foundation
 import Alamofire
 import CoreLocation
-import CoreData
+
+let OpenWeatherAPIKey = "4c8b3b461a4559a8ac0c397de4b3aaaf"
 
 extension Date {
   var millisecondsSince1970:Int {
@@ -21,13 +22,13 @@ class MainViewController: UIViewController {
   }
 
   private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/group?id="
-  private let openWeatherMapAPIKey = "&APPID=4c8b3b461a4559a8ac0c397de4b3aaaf"
+  private let openWeatherMapAPIKey = "&APPID=" + OpenWeatherAPIKey
+
   private let kSelectedCityIDsKey = "selectedCityIDs"
   private let kCityListKey = "cityList"
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
-//  private let refreshControl = UIRefreshControl()
 
-  private var weatherResults = Result(list: [WeatherInfo](), cnt: 0)
+  private var weatherResult: WeatherResult?
   private var cityList = [City]()
 
   private lazy var jsonDecoder: JSONDecoder = {
@@ -45,13 +46,6 @@ class MainViewController: UIViewController {
     }
   }
 
-  private lazy var refreshControl: UIRefreshControl = {
-    let refreshControl = UIRefreshControl()
-    refreshControl.addTarget(self, action: #selector(refresh(refreshControl:)), for: UIControl.Event.valueChanged)
-    tableView.refreshControl = refreshControl
-    return refreshControl
-  }()
-
   @IBOutlet weak var addButton: UIButton!
   @IBOutlet weak var tableView: UITableView!
 
@@ -59,18 +53,14 @@ class MainViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
   
-//    refreshControl.addTarget(self, action: #selector(refresh(refreshControl:)), for: UIControl.Event.valueChanged)
-//    tableView.refreshControl = refreshControl
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(refresh(refreshControl:)), for: UIControl.Event.valueChanged)
+    tableView.refreshControl = refreshControl
 
-//    let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
-//    tableView.addGestureRecognizer(longpress)
+    let longpress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(gestureRecognizer:)))
+    tableView.addGestureRecognizer(longpress)
 
     getCityList()
-
-//    print(selectedCityIDs)
-//    selectedCityIDs.forEach { cityID in
-//      self.getWeather(from: cityID)
-//    }
     getWeather()
   }
 
@@ -105,13 +95,14 @@ class MainViewController: UIViewController {
 
     Alamofire.request(url, method: .get).validate().responseData { response in
 
+      self.startAnimatimgIndicator()
+
       switch response.result {
       case.success(let data):
 
         do {
-          let weatherResult = try self.jsonDecoder.decode(Result.self, from: data)
-          self.weatherResults = weatherResult
-          print(weatherResult.list.count)
+          let weatherResult = try self.jsonDecoder.decode(WeatherResult.self, from: data)
+          self.weatherResult = weatherResult
         } catch {
           print(error)
         }
@@ -120,61 +111,10 @@ class MainViewController: UIViewController {
       case .failure(let error):
         print(error)
       }
+      self.stopAnimatimgIndicator()
+      self.tableView.refreshControl?.endRefreshing()
     }
   }
-
-
-//  private func getWeather(from cityID: Int) {
-//    let url = openWeatherMapBaseURL + "\(cityID)" + openWeatherMapAPIKey
-//
-//    Alamofire.request(url, method: .get).validate().responseData { response in
-//      self.startAnimatimgIndicator()
-//      switch response.result {
-//      case.success(let data):
-//
-//        guard let weatherInfo = try? self.jsonDecoder.decode(WeatherInfo.self, from: data) else { return }
-//
-//        self.weatherInfos.append(weatherInfo)
-////        self.sort2()
-//
-//        print("Got response from API : \(weatherInfo.id)")
-//        self.tableView.reloadData()
-//
-//      case .failure(let error):
-//        print(error)
-//      }
-//      self.indicator.stopAnimating()
-//      self.indicator.hidesWhenStopped = true
-//      self.indicator.removeFromSuperview()
-//
-//      self.refreshControl.endRefreshing()
-//    }
-//  }
-
-//  func sort2() {
-//    weatherInfos = weatherInfos.sorted { selectedCityIDs.firstIndex(of: $0.id) ?? -1 < selectedCityIDs.firstIndex(of: $1.id) ?? -1 }
-//  }
-//
-//  func sort() {
-//
-//    func findWeatherInfo(by cityID: Int) -> WeatherInfo? {
-//      for info in weatherInfos {
-//        if info.id == cityID {
-//          return info
-//        }
-//      }
-//      return nil
-//    }
-//
-//    var sortedWeatehrInfos = [WeatherInfo]()
-//
-//    selectedCityIDs.forEach { (id) in
-//      if let w = findWeatherInfo(by: id) {
-//        sortedWeatehrInfos.append(w)
-//      }
-//    }
-//    weatherInfos = sortedWeatehrInfos
-//  }
 
   func startAnimatimgIndicator() {
     indicator.center = view.center
@@ -183,70 +123,77 @@ class MainViewController: UIViewController {
     view.addSubview(indicator)
   }
 
-  @objc func refresh(refreshControl: UIRefreshControl) {
-//    weatherInfos = []
-//    selectedCityIDs.forEach { cityID in
-//      self.getWeather(from: cityID)
-//    }
+  func stopAnimatimgIndicator() {
+    indicator.stopAnimating()
+    indicator.hidesWhenStopped = true
+    indicator.removeFromSuperview()
   }
 
-//  @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
-//    let longpress = gestureRecognizer as! UILongPressGestureRecognizer
-//    let state = longpress.state
-//    let locationInView = longpress.location(in: self.tableView)
-//    let indexPath = self.tableView.indexPathForRow(at: locationInView)
-//
-//    switch state {
-//    case .began:
-//      if indexPath != nil {
-//        Path.initialIndexPath = indexPath
-//        let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
-//        My.cellSnapShot = snapshopOfCell(inputView: cell)
-//        var center = cell.center
-//        My.cellSnapShot?.center = center
-//        My.cellSnapShot?.alpha = 0.0
-//        self.tableView.addSubview(My.cellSnapShot!)
-//
-//        UIView.animate(withDuration: 0.25, animations: {
-//          center.y = locationInView.y
-//          My.cellSnapShot?.center = center
-//          My.cellSnapShot?.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
-//          My.cellSnapShot?.alpha = 0.98
-//          cell.alpha = 0.0
-//        }, completion: { (finished) -> Void in
-//          if finished {
-//            cell.isHidden = true
-//          }
-//        })
-//      }
-//    case .changed:
-//      var center = My.cellSnapShot?.center
-//      center?.y = locationInView.y
-//      My.cellSnapShot?.center = center!
-//      if (indexPath != nil && indexPath != Path.initialIndexPath) {
-//        self.selectedCityIDs.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
-//        self.weatherInfos.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
-//        self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
-//        Path.initialIndexPath = indexPath
-//      }
-//    default:
-//      let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
-//      cell.isHidden = false
-//      cell.alpha = 0.0
-//      UIView.animate(withDuration: 0.25, animations: {
-//        My.cellSnapShot?.center = cell.center
-//        My.cellSnapShot?.transform = .identity
-//        My.cellSnapShot?.alpha = 0.0
-//        cell.alpha = 1.0
-//      }, completion: { (finished) -> Void in
-//        if finished {
-//          Path.initialIndexPath = nil
-//          My.cellSnapShot?.removeFromSuperview()
-//          My.cellSnapShot = nil
-//        }
-//      })
-//    }
-//  }
+  @objc func refresh(refreshControl: UIRefreshControl) {
+    getWeather()
+  }
+
+  @objc func longPressGestureRecognized(gestureRecognizer: UIGestureRecognizer) {
+    let longpress = gestureRecognizer as! UILongPressGestureRecognizer
+    let state = longpress.state
+    let locationInView = longpress.location(in: self.tableView)
+    let indexPath = self.tableView.indexPathForRow(at: locationInView)
+
+    switch state {
+    case .began:
+      if indexPath != nil {
+        Path.initialIndexPath = indexPath
+        let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
+        My.cellSnapShot = snapshopOfCell(inputView: cell)
+        var center = cell.center
+        My.cellSnapShot?.center = center
+        My.cellSnapShot?.alpha = 0.0
+        self.tableView.addSubview(My.cellSnapShot!)
+
+        UIView.animate(withDuration: 0.25, animations: {
+          center.y = locationInView.y
+          My.cellSnapShot?.center = center
+          My.cellSnapShot?.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+          My.cellSnapShot?.alpha = 0.98
+          cell.alpha = 0.0
+        }, completion: { (finished) -> Void in
+          if finished {
+            cell.isHidden = true
+          }
+        })
+      }
+    case .changed:
+      var center = My.cellSnapShot?.center
+      center?.y = locationInView.y
+      My.cellSnapShot?.center = center!
+      if (indexPath != nil && indexPath != Path.initialIndexPath), let weatherResult = weatherResult {
+        self.selectedCityIDs.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+
+        var newList = weatherResult.list
+        newList.swapAt((indexPath?.row)!, (Path.initialIndexPath?.row)!)
+        self.weatherResult = WeatherResult(list: newList, cnt: newList.count)
+
+        self.tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
+        Path.initialIndexPath = indexPath
+      }
+    default:
+      let cell = self.tableView.cellForRow(at: indexPath!) as! MainViewCell
+      cell.isHidden = false
+      cell.alpha = 0.0
+      UIView.animate(withDuration: 0.25, animations: {
+        My.cellSnapShot?.center = cell.center
+        My.cellSnapShot?.transform = .identity
+        My.cellSnapShot?.alpha = 0.0
+        cell.alpha = 1.0
+      }, completion: { (finished) -> Void in
+        if finished {
+          Path.initialIndexPath = nil
+          My.cellSnapShot?.removeFromSuperview()
+          My.cellSnapShot = nil
+        }
+      })
+    }
+  }
 
   func snapshopOfCell(inputView: UIView) -> UIView {
     UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
@@ -282,7 +229,7 @@ extension MainViewController: SearchCityDelegate {
     guard !selectedCityIDs.contains(cityID) else { return }
 
     selectedCityIDs.append(cityID)
-//    getWeather(from: cityID)
+    getWeather()
   }
 }
 
@@ -293,13 +240,15 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return weatherResults.list.count
+    return weatherResult?.list.count ?? 0
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
     let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: MainViewCell.identifier, for: indexPath) as! MainViewCell
-    cell.fillCell(data: weatherResults.list[indexPath.row])
+    if let weather = weatherResult?.list[indexPath.row] {
+      cell.fillCell(data: weather)
+    }
     return cell
   }
 
@@ -308,11 +257,12 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
   }
 
   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-    if editingStyle == .delete {
-      self.selectedCityIDs.remove(at: indexPath.row)
-      self.weatherResults.list.remove(at: indexPath.row)
-      tableView.deleteRows(at: [indexPath], with: .right)
-      tableView.reloadData()
-    }
+    guard editingStyle == .delete, let weatherResult = weatherResult else { return }
+
+    self.selectedCityIDs.remove(at: indexPath.row)
+    let newList = weatherResult.list.enumerated().filter { $0.offset != indexPath.row }.map { $0.element }
+    self.weatherResult = WeatherResult(list: newList, cnt: newList.count)
+    tableView.deleteRows(at: [indexPath], with: .right)
+    tableView.reloadData()
   }
 }

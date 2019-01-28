@@ -34,11 +34,19 @@ class SearchCityViewController: UIViewController {
     indicator.hidesWhenStopped = false
     view.addSubview(indicator)
   }
+
+  func stopAnimatimgIndicator() {
+    indicator.stopAnimating()
+    indicator.hidesWhenStopped = true
+    indicator.removeFromSuperview()
+  }
 }
 
 extension SearchCityViewController: UISearchBarDelegate {
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+
     startAnimatimgIndicator()
+    
     guard let cityList = delegate?.searchCityList else { return }
 
     if let searchText = searchBar.text, !searchText.isEmpty {
@@ -46,9 +54,7 @@ extension SearchCityViewController: UISearchBarDelegate {
         return city.name.lowercased().contains(searchText.lowercased())
       }
     }
-    self.indicator.stopAnimating()
-    self.indicator.hidesWhenStopped = true
-    self.indicator.removeFromSuperview()
+    stopAnimatimgIndicator()
     tableView.reloadData()
   }
 }

@@ -6,9 +6,7 @@ struct WeatherInfo: Codable {
   let main: Main
 
   let coord: Coord?
-  let cod: Int?
   let sys: Sys?
-  let base: String?
   let dt: Int?
   let wind: Wind?
   let weather: [Weather]?

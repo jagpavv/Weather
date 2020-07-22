@@ -7,5 +7,6 @@ struct Main: Codable {
   let tempMax: Float?
   let tempMin: Float?
   let humidity: Int?
-  let fealsLike: Float?
+  let seaLevel: Float?
+  let grndLevel: Float?
 }

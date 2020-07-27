@@ -1,9 +1,9 @@
 import Foundation
 
 struct WeatherInfo: Codable {
-  let id: Int
-  let name: String
-  let main: Main
+  let id: Int?
+  let name: String?
+  let main: Main?
 
   let coord: Coord?
   let cod: Int?

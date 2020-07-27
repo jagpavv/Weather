@@ -1,7 +1,7 @@
 import Foundation
 
 struct Sys: Codable {
-  let id: Int
+  let id: Int?
 
   let message: Float?
   let type: Int?

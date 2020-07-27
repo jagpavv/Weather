@@ -1,12 +1,12 @@
 import Foundation
 
 struct Main: Codable {
-  let temp: Float
+  let temp: Double?
 
-  let pressure: Float?
-  let tempMax: Float?
-  let tempMin: Float?
+  let pressure: Double?
+  let tempMax: Double?
+  let tempMin: Double?
   let humidity: Int?
-  let seaLevel: Float?
-  let grndLevel: Float?
+  let seaLevel: Double?
+  let grndLevel: Double?
 }

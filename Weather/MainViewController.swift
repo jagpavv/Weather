@@ -3,8 +3,6 @@ import Foundation
 import Alamofire
 import CoreLocation
 
-let OpenWeatherAPIKey = "4c8b3b461a4559a8ac0c397de4b3aaaf"
-
 extension Date {
   var millisecondsSince1970:Int {
     return Int((self.timeIntervalSince1970 * 1000.0).rounded())
@@ -21,8 +19,10 @@ class MainViewController: UIViewController {
     static var initialIndexPath: IndexPath? = nil
   }
 
-  private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/group?id="
-  private let openWeatherMapAPIKey = "&APPID=" + OpenWeatherAPIKey
+  private let weatherSearchService = WeatherSearchService()
+
+//  private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/group?id="
+//  private let openWeatherMapAPIKey = "&APPID=" + OpenWeatherAPIKey
 
   private let kSelectedCityIDsKey = "selectedCityIDs"
   private let kCityListKey = "cityList"
@@ -89,44 +89,43 @@ class MainViewController: UIViewController {
   }
 
   func getWeather() {
-    let cityIDString = selectedCityIDs.map { String($0) }.joined(separator: ",") + "&units=metric"
-    let url = openWeatherMapBaseURL + cityIDString + openWeatherMapAPIKey
-    print(url)
+    let cityIDString = selectedCityIDs.map { String($0) }.joined(separator: ",")
 
-    Alamofire.request(url, method: .get).validate().responseData { response in
-
-      self.startAnimatimgIndicator()
-
-      switch response.result {
-      case.success(let data):
-
-        do {
-          let weatherResult = try self.jsonDecoder.decode(WeatherResult.self, from: data)
-          self.weatherResult = weatherResult
-        } catch {
-          print(error)
+    self.startAnimatimgIndicator()
+    weatherSearchService.getWeather(cityIDString: cityIDString) { result in
+      switch result {
+      case .success(let weatherResult):
+        self.weatherResult = weatherResult
+        DispatchQueue.main.async {
+          self.tableView.reloadData()
         }
-        self.tableView.reloadData()
 
       case .failure(let error):
-        print(error)
+        print("error", error.localizedDescription)
       }
       self.stopAnimatimgIndicator()
-      self.tableView.refreshControl?.endRefreshing()
+
+      DispatchQueue.main.async {
+        self.tableView.refreshControl?.endRefreshing()
+      }
     }
   }
 
   func startAnimatimgIndicator() {
-    indicator.center = view.center
-    indicator.startAnimating()
-    indicator.hidesWhenStopped = false
-    view.addSubview(indicator)
+    DispatchQueue.main.async {
+      self.indicator.center = self.view.center
+      self.indicator.startAnimating()
+      self.indicator.hidesWhenStopped = false
+      self.view.addSubview(self.indicator)
+    }
   }
 
   func stopAnimatimgIndicator() {
-    indicator.stopAnimating()
-    indicator.hidesWhenStopped = true
-    indicator.removeFromSuperview()
+    DispatchQueue.main.async {
+      self.indicator.stopAnimating()
+      self.indicator.hidesWhenStopped = true
+      self.indicator.removeFromSuperview()
+    }
   }
 
   @objc func refresh(refreshControl: UIRefreshControl) {

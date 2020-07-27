@@ -15,8 +15,6 @@ class WeatherSearchService {
 
   func getWeather(cityIDString: String, completion: @escaping (Result<WeatherResult, Error>) -> Void) {
 
-    let cityIDString = "524901,703448,2643743"
-
     guard var components = URLComponents(string: baseURL + path) else { return }
     components.queryItems = [URLQueryItem(name: "id", value: cityIDString),
                              URLQueryItem(name: "units", value: "metric"),

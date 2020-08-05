@@ -2,44 +2,37 @@ import UIKit
 import Foundation
 import CoreLocation
 
-extension Date {
-  var millisecondsSince1970:Int {
-    return Int((self.timeIntervalSince1970 * 1000.0).rounded())
-  }
-}
+class WeatherViewController: UIViewController {
 
-class MainViewController: UIViewController {
-
-  struct My {
-    static var cellSnapShot: UIView? = nil
-  }
-
-  struct Path {
-    static var initialIndexPath: IndexPath? = nil
-  }
-
-  private let viewModel = WeatherViewModel()
+  private let viewModel: WeatherViewModelProtocol = WeatherViewModel()
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
 
   @IBOutlet weak var addButton: UIButton!
   @IBOutlet weak var tableView: UITableView!
 
-  // MARK: - View life cycle
+// MARK: - View life cycle
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    viewModel.weatherResult.bind { _ in
+    addButton.isEnabled = true
+
+    viewModel.weatherResult.bind { weatherResult in
+      print("weather results: \(weatherResult.cnt)")
       DispatchQueue.main.async {
+        self.tableView.refreshControl?.endRefreshing()
         self.tableView.reloadData()
       }
     }
 
-    viewModel.getCityList()
-    viewModel.cityList.bind { [weak self] cityList in
-      DispatchQueue.main.async {
-        self?.addButton.isEnabled = !cityList.isEmpty
+    viewModel.isLoading.bind { isLoading in
+      if isLoading {
+        self.startAnimatimgIndicator()
+      } else {
+        self.stopAnimatimgIndicator()
       }
     }
+
+    viewModel.getWeather()
 
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(refresh(refreshControl:)), for: UIControl.Event.valueChanged)
@@ -67,65 +60,40 @@ class MainViewController: UIViewController {
     viewModel.getWeather()
   }
 
-  //   MARK: - Navigation
+// MARK: - Navigation
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     if segue.identifier == "searchCitySegue" {
       let dest = segue.destination as? SearchCityViewController
       dest?.delegate = self
+//      dest?.completionHandlers = { [weak self] id in
+//        self?.viewModel.addCity(id: id)
+//        print("completionHandlers", id)
+//      }
     }
   }
 }
 
-// MARK: - SearchCityDelegate
-extension MainViewController: SearchCityDelegate {
-
-  var searchCityList: [City]? {
-    return viewModel.cityList.value
-  }
-
-  func searchCitySelected(cityID: Int) {
-    guard !viewModel.selectedCityIDs.contains(cityID) else { return }
-    viewModel.selectedCityIDs.append(cityID)
-    viewModel.getWeather()
-  }
-}
-
 // MARK: - UITableViewDataSource, UITableViewDelegate
-extension MainViewController: UITableViewDataSource, UITableViewDelegate {
+extension WeatherViewController: UITableViewDataSource, UITableViewDelegate {
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
     return CGFloat(200)
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.weatherResult.value?.list.count ?? 0
+    return viewModel.weatherResult.value.list.count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
     let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: MainViewCell.identifier, for: indexPath) as! MainViewCell
-    if let weather = viewModel.weatherResult.value?.list[indexPath.row] {
-      cell.fillCell(data: weather)
-    }
+    let weather = viewModel.weatherResult.value.list[indexPath.row]
+    cell.fillCell(data: weather)
     return cell
   }
 }
 
-extension MainViewController: WeatherSearchProtocol {
-  func startLoading() {
-    startAnimatimgIndicator()
-  }
-
-  func updateWithWeathers() {
-    DispatchQueue.main.async {
-      self.tableView.reloadData()
-    }
-  }
-
-  func finishLoading() {
-    stopAnimatimgIndicator()
-
-    DispatchQueue.main.async {
-      self.tableView.refreshControl?.endRefreshing()
-    }
+extension WeatherViewController: SearchCityDelegate {
+  func searchCityDelegateSelectedCity(id: Int) {
+    print(id)
   }
 }

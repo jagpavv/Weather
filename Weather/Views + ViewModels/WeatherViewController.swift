@@ -1,43 +1,45 @@
 import UIKit
-import Foundation
 import CoreLocation
+import RxSwift
+import RxCocoa
 
 class WeatherViewController: UIViewController {
 
-  private let viewModel: WeatherViewModelProtocol = WeatherViewModel()
+  @IBOutlet weak var tableView: UITableView!
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
 
-  @IBOutlet weak var addButton: UIButton!
-  @IBOutlet weak var tableView: UITableView!
+  private let viewModel: WeatherViewModelProtocol = WeatherViewModel()
+  private let disposeBag = DisposeBag()
 
-// MARK: - View life cycle
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  private lazy var callOnce: Void = {
+    bind()
+  }()
 
-    addButton.isEnabled = true
-
-    viewModel.weatherResult.bind { weatherResult in
-      print("weather results: \(weatherResult.cnt)")
-      DispatchQueue.main.async {
-        self.tableView.refreshControl?.endRefreshing()
-        self.tableView.reloadData()
-      }
-    }
-
-    viewModel.isLoading.bind { isLoading in
-      if isLoading {
-        self.startAnimatimgIndicator()
-      } else {
-        self.stopAnimatimgIndicator()
-      }
-    }
-
-    viewModel.getWeather()
-
-    let refreshControl = UIRefreshControl()
-    refreshControl.addTarget(self, action: #selector(refresh(refreshControl:)), for: UIControl.Event.valueChanged)
-    tableView.refreshControl = refreshControl
+  // MARK: - View life cycle
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    _ = callOnce
   }
+
+  private func bind() {
+    viewModel.weathers
+      .bind(to: tableView.rx.items(cellIdentifier: WeatherTableViewCell.identifier, cellType: WeatherTableViewCell.self)) { (row, weatherInfo, cell) in
+        cell.fillCell(data: weatherInfo)
+      }
+      .disposed(by: disposeBag)
+  }
+
+//  override func viewWillAppear(_ animated: Bool) {
+//    super.viewWillAppear(animated)
+//
+//    viewModel.weathers
+//      .bind(to: tableView.rx.items(cellIdentifier: WeatherTableViewCell.identifier, cellType: WeatherTableViewCell.self)) { (row, weatherInfo, cell) in
+//      cell.fillCell(data: weatherInfo)
+//      }
+//      .disposed(by: disposeBag)
+//
+//    viewModel.selectedCitySubject.onNext(524901)
+//  }
 
   func startAnimatimgIndicator() {
     DispatchQueue.main.async {
@@ -55,45 +57,30 @@ class WeatherViewController: UIViewController {
       self.indicator.removeFromSuperview()
     }
   }
-
-  @objc func refresh(refreshControl: UIRefreshControl) {
-    viewModel.getWeather()
-  }
-
-// MARK: - Navigation
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == "searchCitySegue" {
-      let dest = segue.destination as? SearchCityViewController
-      dest?.delegate = self
-//      dest?.completionHandlers = { [weak self] id in
-//        self?.viewModel.addCity(id: id)
-//        print("completionHandlers", id)
-//      }
-    }
-  }
 }
 
-// MARK: - UITableViewDataSource, UITableViewDelegate
-extension WeatherViewController: UITableViewDataSource, UITableViewDelegate {
-  func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    return CGFloat(200)
-  }
+//  @objc func refresh(refreshControl: UIRefreshControl) {
+//    viewModel.getWeather()
+//  }
 
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.weatherResult.value.list.count
-  }
-
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-    let cell: MainViewCell = tableView.dequeueReusableCell(withIdentifier: MainViewCell.identifier, for: indexPath) as! MainViewCell
-    let weather = viewModel.weatherResult.value.list[indexPath.row]
-    cell.fillCell(data: weather)
-    return cell
-  }
-}
-
-extension WeatherViewController: SearchCityDelegate {
-  func searchCityDelegateSelectedCity(id: Int) {
-    print(id)
-  }
-}
+//// MARK: - Navigation
+//  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//    if segue.identifier == "searchCitySegue" {
+//      let dest = segue.destination as? SearchCityViewController
+//      dest?.delegate = self
+////      dest?.completionHandlers = { [weak self] id in
+////        self?.viewModel.addCity(id: id)
+////        print("completionHandlers", id)
+////      }
+//    }
+//  }
+//}
+//
+//extension WeatherViewController: SearchCityDelegate {
+//  func searchCityDelegateSelectedCity(id: Int) {
+//
+//    viewModel.selectedCitySubject.onNext(id)
+//
+//    print(id)
+//  }
+//}

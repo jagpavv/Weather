@@ -1,14 +1,15 @@
 
 import Foundation
+import RxSwift
 
 protocol WeatherViewModelProtocol {
   // Output
-  var weatherResult: Box<WeatherResult> { get }
-  var isLoading: Box<Bool> { get }
+  var weathers: BehaviorSubject<[WeatherInfo]> { get }
+//  var isLoading: BehaviorSubject<[Bool]> { get }
 
   // Input
-  func addCity(id: Int)
-  func getWeather()
+//  var requestWeather: PublishSubject<Void> { get }
+  var selectedCity: PublishSubject<Int> { get }
 }
 
 class WeatherViewModel: WeatherViewModelProtocol {
@@ -16,41 +17,44 @@ class WeatherViewModel: WeatherViewModelProtocol {
   private let kSelectedCityIDsKey = "selectedCityIDs"
   private let weatherSearchService = WeatherSearchService()
 
-  var weatherResult: Box<WeatherResult> = Box(WeatherResult(list: [], cnt: 0))
-  var isLoading: Box<Bool> = Box(false)
+  let weathers: BehaviorSubject<[WeatherInfo]> = BehaviorSubject(value: [])
+  let selectedCity: PublishSubject<Int> = PublishSubject()
+//  let requestWeather: PublishSubject<Void> = PublishSubject()
+  let disposeBag = DisposeBag()
 
-  private var selectedCities: [Int] {
+  private var selectedCities: BehaviorSubject<[Int]> {
     get {
-      return UserDefaults.standard.object(forKey: kSelectedCityIDsKey) as? [Int] ?? [Int]()
+      return UserDefaults.standard.object(forKey: kSelectedCityIDsKey) as? BehaviorSubject<[Int]> ?? BehaviorSubject(value: [])
     }
     set {
       UserDefaults.standard.set(newValue, forKey: kSelectedCityIDsKey)
     }
   }
 
-  private var stringSelectedCities: String? {
-    return selectedCities.map{ String($0) }.joined(separator: ",")
+  init() {
+    bind()
   }
 
-  func addCity(id: Int) {
-    guard !selectedCities.contains(id) else { return }
-    selectedCities.append(id)
-    getWeather()
-  }
+  private func bind() {
 
-  func getWeather() {
-    guard let stringSelectedCities = stringSelectedCities else { return }
-    print("stringSelectedCities", stringSelectedCities)
 
-    isLoading.value = true
-    weatherSearchService.getWeather(cityIDString: stringSelectedCities) { result in
-      self.isLoading.value = false
-      switch result {
-      case .success(let weatherResult):
-        self.weatherResult.value = weatherResult
-      case .failure(let error):
-        print("error", error.localizedDescription)
-      }
-    }
+//    selectedCity
+//      .withLatestFrom(selectedCities) { (id: $0, idArray: $1) }
+//      .filter{ !$1.contains($0) }
+//      .map { (id: Int, _) in
+//        [id]
+//      } .withLatestFrom(selectedCities) { (newID: $0, exstingIDs: $1) }
+//        .map { $1 + $0 }
+//        .bind(to: selectedCities)
+//        .disposed(by: disposeBag)
+//
+//    selectedCities
+//      .map { ids in
+//        ids.map { String($0) }.joined(separator: ",")
+//      }.flatMap { cities in
+//        self.weatherSearchService.getWeatherSingle(cityIDString: cities)
+//      }.map { $0.list }
+//      .bind(to: weathers)
+//      .disposed(by: disposeBag)
   }
 }

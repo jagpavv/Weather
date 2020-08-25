@@ -16,7 +16,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
+    self.window = UIWindow(frame: UIScreen.main.bounds)
+
+    let storyboard = UIStoryboard(name: "WeatherViewController", bundle: nil)
+//    if #available(iOS 13.0, *) {
+//      let weatherViewController = storyboard.instantiateViewController(identifier: "WeatherViewController") as! WeatherViewController
+//    } else {
+      let weatherViewController = storyboard.instantiateViewController(withIdentifier: "WeatherViewController") as! WeatherViewController
+//    }
+
+    let navigationController = UINavigationController()
+    navigationController.viewControllers = [weatherViewController]
+    self.window?.rootViewController = navigationController
+    self.window?.makeKeyAndVisible()
     return true
   }
 

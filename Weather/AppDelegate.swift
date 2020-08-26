@@ -18,12 +18,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     self.window = UIWindow(frame: UIScreen.main.bounds)
 
+    let weatherService = WeatherService()
+    let weatherViewModel = WeatherViewModel(service: weatherService)
+
     let storyboard = UIStoryboard(name: "WeatherViewController", bundle: nil)
-//    if #available(iOS 13.0, *) {
-//      let weatherViewController = storyboard.instantiateViewController(identifier: "WeatherViewController") as! WeatherViewController
-//    } else {
-      let weatherViewController = storyboard.instantiateViewController(withIdentifier: "WeatherViewController") as! WeatherViewController
-//    }
+    let weatherViewController = storyboard.instantiateViewController(withIdentifier: "WeatherViewController") as! WeatherViewController
+    weatherViewController.viewModel = weatherViewModel
 
     let navigationController = UINavigationController()
     navigationController.viewControllers = [weatherViewController]

@@ -1,15 +1,13 @@
 import Foundation
 import RxSwift
 
-protocol WeatherSearchServiceProtocol {
+protocol WeatherServiceProtocol {
 //  var isLoading: BehaviorSubject<Bool> { get }
   func getWeatherSingle(cityIDString: String) -> Single<WeatherResult>
 }
 
-let OpenWeatherAPIKey = "4c8b3b461a4559a8ac0c397de4b3aaaf"
-
-class WeatherService: WeatherSearchServiceProtocol {
-
+class WeatherService: WeatherServiceProtocol {
+  private let OpenWeatherAPIKey = "4c8b3b461a4559a8ac0c397de4b3aaaf"
   private var baseURL = "http://api.openweathermap.org"
   private var path = "/data/2.5/group"
 
@@ -18,7 +16,7 @@ class WeatherService: WeatherSearchServiceProtocol {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
   }()
-  let isLoading: BehaviorSubject<Bool> = BehaviorSubject(value: false) // BehaviorRelay
+  private let isLoading: BehaviorSubject<Bool> = BehaviorSubject(value: false) // TODO: - BehaviorRelay
 
   func getWeatherSingle(cityIDString: String) -> Single<WeatherResult> {
     return Single.create { [weak self] singleObserver in
@@ -31,7 +29,7 @@ class WeatherService: WeatherSearchServiceProtocol {
       }
       components.queryItems = [URLQueryItem(name: "id", value: cityIDString),
                                URLQueryItem(name: "units", value: "metric"),
-                               URLQueryItem(name: "APPID", value: OpenWeatherAPIKey)]
+                               URLQueryItem(name: "APPID", value: self.OpenWeatherAPIKey)]
 
       guard let url = components.url else {
         singleObserver(.error(NSError()))

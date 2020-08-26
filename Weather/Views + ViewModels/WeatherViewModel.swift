@@ -15,9 +15,10 @@ protocol WeatherViewModelProtocol {
 class WeatherViewModel: WeatherViewModelProtocol {
 
   private let kSelectedCityIDsKey = "selectedCityIDs"
-  private let weatherSearchService = WeatherSearchService()
+  private let weatherService: WeatherServiceProtocol
 
   let weathers: BehaviorSubject<[WeatherInfo]> = BehaviorSubject(value: [])
+
   let selectedCity: PublishSubject<Int> = PublishSubject()
   let requestWeather: PublishSubject<Void> = PublishSubject()
   let disposeBag = DisposeBag()
@@ -31,7 +32,9 @@ class WeatherViewModel: WeatherViewModelProtocol {
     }
   }
 
-  init() {
+  init(service: WeatherServiceProtocol) {
+    weatherService = service
+
     bind()
   }
 
@@ -43,7 +46,7 @@ class WeatherViewModel: WeatherViewModelProtocol {
       .map { $0.map { String($0) }.joined(separator: ",")
       }
       .flatMap { cities in
-        self.weatherSearchService.getWeatherSingle(cityIDString: cities)
+        self.weatherService.getWeatherSingle(cityIDString: cities)
       }
       .map { $0.list }
       .bind(to: weathers)
@@ -65,7 +68,7 @@ class WeatherViewModel: WeatherViewModelProtocol {
 //      .map { ids in
 //        ids.map { String($0) }.joined(separator: ",")
 //      }.flatMap { cities in
-//        self.weatherSearchService.getWeatherSingle(cityIDString: cities)
+//        self.weatherService.getWeatherSingle(cityIDString: cities)
 //      }.map { $0.list }
 //      .bind(to: weathers)
 //      .disposed(by: disposeBag)

@@ -8,7 +8,7 @@ class WeatherViewController: UIViewController {
   @IBOutlet weak var tableView: UITableView!
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
 
-  private let viewModel: WeatherViewModelProtocol = WeatherViewModel()
+  var viewModel: WeatherViewModelProtocol! = nil
   private let disposeBag = DisposeBag()
 
   private lazy var callOnce: Void = {
@@ -22,6 +22,7 @@ class WeatherViewController: UIViewController {
   }
 
   private func bind() {
+
     viewModel.weathers
       .bind(to: tableView.rx.items(cellIdentifier: WeatherTableViewCell.identifier, cellType: WeatherTableViewCell.self)) { (row, weatherInfo, cell) in
         cell.fillCell(data: weatherInfo)

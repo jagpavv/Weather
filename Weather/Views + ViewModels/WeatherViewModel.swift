@@ -8,7 +8,7 @@ protocol WeatherViewModelProtocol {
 //  var isLoading: BehaviorSubject<[Bool]> { get }
 
   // Input
-//  var requestWeather: PublishSubject<Void> { get }
+  var requestWeather: PublishSubject<Void> { get }
   var selectedCity: PublishSubject<Int> { get }
 }
 
@@ -19,12 +19,12 @@ class WeatherViewModel: WeatherViewModelProtocol {
 
   let weathers: BehaviorSubject<[WeatherInfo]> = BehaviorSubject(value: [])
   let selectedCity: PublishSubject<Int> = PublishSubject()
-//  let requestWeather: PublishSubject<Void> = PublishSubject()
+  let requestWeather: PublishSubject<Void> = PublishSubject()
   let disposeBag = DisposeBag()
 
-  private var selectedCities: BehaviorSubject<[Int]> {
+  private var selectedCities: [Int] {
     get {
-      return UserDefaults.standard.object(forKey: kSelectedCityIDsKey) as? BehaviorSubject<[Int]> ?? BehaviorSubject(value: [])
+      return UserDefaults.standard.object(forKey: kSelectedCityIDsKey) as? [Int] ?? [Int]()
     }
     set {
       UserDefaults.standard.set(newValue, forKey: kSelectedCityIDsKey)
@@ -36,6 +36,19 @@ class WeatherViewModel: WeatherViewModelProtocol {
   }
 
   private func bind() {
+    print("selectedCities", selectedCities)
+
+    requestWeather
+      .map { self.selectedCities }
+      .map { $0.map { String($0) }.joined(separator: ",")
+      }
+      .flatMap { cities in
+        self.weatherSearchService.getWeatherSingle(cityIDString: cities)
+      }
+      .map { $0.list }
+      .bind(to: weathers)
+      .disposed(by: disposeBag)
+
 
 
 //    selectedCity

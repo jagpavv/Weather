@@ -14,6 +14,7 @@ class WeatherTableViewCell: UITableViewCell {
   @IBOutlet weak var cityLabel: UILabel!
 
   func fillCell(data: WeatherInfo) {
-      self.cityLabel.text = "cell"
+    self.cityLabel.text = data.name!
+    print("name", data.name)
     }
 }

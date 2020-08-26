@@ -27,6 +27,13 @@ class WeatherViewController: UIViewController {
         cell.fillCell(data: weatherInfo)
       }
       .disposed(by: disposeBag)
+
+    // load weather data only once
+    viewModel.weathers
+      .filter { $0.isEmpty }
+      .map { _ in }
+      .bind(to: viewModel.requestWeather)
+      .dispose()
   }
 
 //  override func viewWillAppear(_ animated: Bool) {

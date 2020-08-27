@@ -1,9 +1,11 @@
 import Foundation
 import RxSwift
+import RxCocoa
 
 protocol WeatherServiceProtocol {
-//  var isLoading: BehaviorSubject<Bool> { get }
-  func getWeatherSingle(cityIDString: String) -> Single<WeatherResult>
+  var isLoading: BehaviorRelay<Bool> { get }
+
+  func getWeather(cityIDString: String) -> Single<WeatherResult>
 }
 
 class WeatherService: WeatherServiceProtocol {
@@ -16,9 +18,9 @@ class WeatherService: WeatherServiceProtocol {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
   }()
-  private let isLoading: BehaviorSubject<Bool> = BehaviorSubject(value: false) // TODO: - BehaviorRelay
 
-  func getWeatherSingle(cityIDString: String) -> Single<WeatherResult> {
+  let isLoading: BehaviorRelay<Bool> = BehaviorRelay(value: false)
+  func getWeather(cityIDString: String) -> Single<WeatherResult> {
     return Single.create { [weak self] singleObserver in
       let disposable = Disposables.create()
 
@@ -38,9 +40,9 @@ class WeatherService: WeatherServiceProtocol {
       print("url", url)
       let request = URLRequest(url: url)
 
-      self.isLoading.onNext(true)
+      self.isLoading.accept(true)
       URLSession.shared.dataTask(with: request) { (data, response, error) in
-        self.isLoading.onNext(false)
+        self.isLoading.accept(false)
         if let error = error {
           singleObserver(.error(error))
         }

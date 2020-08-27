@@ -17,6 +17,11 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
   }()
 
   // MARK: - View life cycle
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    setUI()
+  }
+
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     _ = callOnce
@@ -36,29 +41,19 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
       .map { _ in }
       .bind(to: viewModel.requestWeather)
       .dispose()
-  }
-  
-  func startAnimatimgIndicator() {
-    DispatchQueue.main.async {
-      self.indicator.center = self.view.center
-      self.indicator.startAnimating()
-      self.indicator.hidesWhenStopped = false
-      self.view.addSubview(self.indicator)
-    }
+
+    viewModel.isLoading
+      .bind(to: indicator.rx.isAnimating)
+      .disposed(by: disposeBag)
   }
 
-  func stopAnimatimgIndicator() {
-    DispatchQueue.main.async {
-      self.indicator.stopAnimating()
-      self.indicator.hidesWhenStopped = true
-      self.indicator.removeFromSuperview()
-    }
+  func setUI() {
+    tableView.rowHeight = 60
+
+    view.addSubview(indicator)
+    indicator.center = self.view.center
   }
 }
-
-//  @objc func refresh(refreshControl: UIRefreshControl) {
-//    viewModel.getWeather()
-//  }
 
 //// MARK: - Navigation
 //  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

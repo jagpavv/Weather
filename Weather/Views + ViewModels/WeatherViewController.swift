@@ -3,12 +3,13 @@ import CoreLocation
 import RxSwift
 import RxCocoa
 
-class WeatherViewController: UIViewController {
+class WeatherViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
 
   var viewModel: WeatherViewModelProtocol! = nil
+  weak var coordinator: AppCoordinator?
   private let disposeBag = DisposeBag()
 
   private lazy var callOnce: Void = {
@@ -36,19 +37,7 @@ class WeatherViewController: UIViewController {
       .bind(to: viewModel.requestWeather)
       .dispose()
   }
-
-//  override func viewWillAppear(_ animated: Bool) {
-//    super.viewWillAppear(animated)
-//
-//    viewModel.weathers
-//      .bind(to: tableView.rx.items(cellIdentifier: WeatherTableViewCell.identifier, cellType: WeatherTableViewCell.self)) { (row, weatherInfo, cell) in
-//      cell.fillCell(data: weatherInfo)
-//      }
-//      .disposed(by: disposeBag)
-//
-//    viewModel.selectedCitySubject.onNext(524901)
-//  }
-
+  
   func startAnimatimgIndicator() {
     DispatchQueue.main.async {
       self.indicator.center = self.view.center

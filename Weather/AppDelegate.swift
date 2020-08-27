@@ -13,20 +13,16 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
-
+  var coordinator: AppCoordinator?
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
     self.window = UIWindow(frame: UIScreen.main.bounds)
 
-    let weatherService = WeatherService()
-    let weatherViewModel = WeatherViewModel(service: weatherService)
-
-    let storyboard = UIStoryboard(name: "WeatherViewController", bundle: nil)
-    let weatherViewController = storyboard.instantiateViewController(withIdentifier: "WeatherViewController") as! WeatherViewController
-    weatherViewController.viewModel = weatherViewModel
-
     let navigationController = UINavigationController()
-    navigationController.viewControllers = [weatherViewController]
+    coordinator = AppCoordinator(navigationController: navigationController)
+    coordinator?.start()
+
     self.window?.rootViewController = navigationController
     self.window?.makeKeyAndVisible()
     return true

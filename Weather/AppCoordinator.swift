@@ -25,4 +25,9 @@ class AppCoordinator: Coordinator {
     weatherViewController.viewModel = weatherViewModel
     navigationController.viewControllers = [weatherViewController]
   }
+
+  func showCityViewController() {
+    let cityViewController = CityViewController.initFromStoryboard(with: "CityViewController")
+    navigationController.pushViewController(cityViewController, animated: true)
+  }
 }

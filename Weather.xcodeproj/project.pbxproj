@@ -17,8 +17,9 @@
 		ACC3510124CF0A1200A1A58D /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC3510024CF0A1200A1A58D /* WeatherViewModel.swift */; };
 		ACD3A83824F7D4EF00F2849B /* StoryboardInstantiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD3A83724F7D4EF00F2849B /* StoryboardInstantiable.swift */; };
 		ACD3A83A24F7D7C200F2849B /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD3A83924F7D7C200F2849B /* AppCoordinator.swift */; };
+		ACD3A83C24F9540A00F2849B /* CityViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ACD3A83B24F9540A00F2849B /* CityViewController.storyboard */; };
 		ACF164F421CE3BFB0078DAFF /* WeatherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F321CE3BFB0078DAFF /* WeatherViewController.swift */; };
-		ACF164F621CE3D660078DAFF /* SearchCityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F521CE3D660078DAFF /* SearchCityViewController.swift */; };
+		ACF164F621CE3D660078DAFF /* CityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F521CE3D660078DAFF /* CityViewController.swift */; };
 		ACF164F821CE3FA70078DAFF /* MainViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF164F721CE3FA70078DAFF /* MainViewCell.swift */; };
 		ACF1650421CF13E00078DAFF /* WeatherInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF1650321CF13E00078DAFF /* WeatherInfo.swift */; };
 		ACF1650A21D141810078DAFF /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF1650921D141800078DAFF /* Main.swift */; };
@@ -46,8 +47,9 @@
 		ACC3510024CF0A1200A1A58D /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		ACD3A83724F7D4EF00F2849B /* StoryboardInstantiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardInstantiable.swift; sourceTree = "<group>"; };
 		ACD3A83924F7D7C200F2849B /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		ACD3A83B24F9540A00F2849B /* CityViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CityViewController.storyboard; sourceTree = "<group>"; };
 		ACF164F321CE3BFB0078DAFF /* WeatherViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewController.swift; sourceTree = "<group>"; };
-		ACF164F521CE3D660078DAFF /* SearchCityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCityViewController.swift; sourceTree = "<group>"; };
+		ACF164F521CE3D660078DAFF /* CityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityViewController.swift; sourceTree = "<group>"; };
 		ACF164F721CE3FA70078DAFF /* MainViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewCell.swift; sourceTree = "<group>"; };
 		ACF1650321CF13E00078DAFF /* WeatherInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherInfo.swift; sourceTree = "<group>"; };
 		ACF1650921D141800078DAFF /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
@@ -124,7 +126,8 @@
 				AC99C55424F57113000BA3C7 /* WeatherTableViewCell.swift */,
 				AC99C55224F565C0000BA3C7 /* WeatherViewController.storyboard */,
 				AC5439EB24D9A52D00ACB1B5 /* SearchCityViewModel.swift */,
-				ACF164F521CE3D660078DAFF /* SearchCityViewController.swift */,
+				ACF164F521CE3D660078DAFF /* CityViewController.swift */,
+				ACD3A83B24F9540A00F2849B /* CityViewController.storyboard */,
 				ACF164F721CE3FA70078DAFF /* MainViewCell.swift */,
 			);
 			path = "Views + ViewModels";
@@ -242,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACD3A83C24F9540A00F2849B /* CityViewController.storyboard in Resources */,
 				AC99C55324F565C0000BA3C7 /* WeatherViewController.storyboard in Resources */,
 				ACF5440021CBB834004F9263 /* LaunchScreen.storyboard in Resources */,
 				ACF543FD21CBB834004F9263 /* Assets.xcassets in Resources */,
@@ -303,7 +307,7 @@
 				ACF164F821CE3FA70078DAFF /* MainViewCell.swift in Sources */,
 				ACD3A83A24F7D7C200F2849B /* AppCoordinator.swift in Sources */,
 				ACD3A83824F7D4EF00F2849B /* StoryboardInstantiable.swift in Sources */,
-				ACF164F621CE3D660078DAFF /* SearchCityViewController.swift in Sources */,
+				ACF164F621CE3D660078DAFF /* CityViewController.swift in Sources */,
 				ACF543F321CBB832004F9263 /* AppDelegate.swift in Sources */,
 				ACF164F421CE3BFB0078DAFF /* WeatherViewController.swift in Sources */,
 				ACF1651521D18C450078DAFF /* Clouds.swift in Sources */,

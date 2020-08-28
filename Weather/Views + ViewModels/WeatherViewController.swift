@@ -59,6 +59,7 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
   }
 
   @objc func addTapped() {
+    coordinator?.showCityViewController()
     print("tapped")
   }
 }

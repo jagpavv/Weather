@@ -13,7 +13,8 @@ class AppCoordinator: Coordinator {
   var navigationController: UINavigationController
 
   private let weatherService = WeatherService()
-  private lazy var weatherViewModel = WeatherViewModel(service: weatherService)
+//  private lazy var weatherViewModel = WeatherViewModel(service: weatherService)
+  private lazy var weatherViewModel = WeatherViewModel(service: weatherService, coordinator: self)
 
   init(navigationController: UINavigationController) {
     self.navigationController = navigationController
@@ -21,7 +22,7 @@ class AppCoordinator: Coordinator {
 
   func start() {
     let weatherViewController = WeatherViewController.initFromStoryboard(with: "WeatherViewController")
-    weatherViewController.coordinator = self
+//    weatherViewController.coordinator = self
     weatherViewController.viewModel = weatherViewModel
     navigationController.viewControllers = [weatherViewController]
   }

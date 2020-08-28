@@ -7,10 +7,9 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
-  private lazy var addCityButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
+  private let addCityButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: nil)
 
   var viewModel: WeatherViewModelProtocol! = nil
-  weak var coordinator: AppCoordinator?
   private let disposeBag = DisposeBag()
 
   private lazy var callOnce: Void = {
@@ -46,6 +45,10 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
     viewModel.isLoading
       .bind(to: indicator.rx.isAnimating)
       .disposed(by: disposeBag)
+
+    addCityButton.rx.tap
+      .bind(to: viewModel.pushToNextScene)
+      .disposed(by: disposeBag)
   }
 
   func setUI() {
@@ -56,11 +59,6 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
 
     title = "Weather"
     self.navigationItem.rightBarButtonItem = addCityButton
-  }
-
-  @objc func addTapped() {
-    coordinator?.showCityViewController()
-    print("tapped")
   }
 }
 

@@ -6,7 +6,8 @@ import UIKit
 //
 class CityViewController: UIViewController, StoryboardInstantiable {
 
-//
+  @IBOutlet weak var tableView: UITableView!
+
 //  private let viewModel: SearchCityViewModelProtocol = SearchCityViewModel()
 //  private let cellIdentifier = "serchedCityDisplayCell"
 //  private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
@@ -20,6 +21,7 @@ class CityViewController: UIViewController, StoryboardInstantiable {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    title = "Cities"
     view.backgroundColor = .red
 //    viewModel.cities.bind { cities in
 //      print("cities count:", cities.count)

@@ -11,17 +11,20 @@ protocol WeatherViewModelProtocol {
   // Input
   var requestWeather: PublishSubject<Void> { get }
   var selectedCity: PublishSubject<Int> { get }
+  var pushToNextScene: PublishSubject<Void> { get }
 }
 
 class WeatherViewModel: WeatherViewModelProtocol {
   private let kSelectedCityIDsKey = "selectedCityIDs"
   private let weatherService: WeatherServiceProtocol
+  private weak var coordinator: AppCoordinator?
 
   let weathers: BehaviorSubject<[WeatherInfo]> = BehaviorSubject(value: [])
   let isLoading: BehaviorRelay<Bool> = BehaviorRelay(value: false)
 
   let selectedCity: PublishSubject<Int> = PublishSubject()
   let requestWeather: PublishSubject<Void> = PublishSubject()
+  let pushToNextScene: PublishSubject<Void> = PublishSubject()
   let disposeBag = DisposeBag()
 
   private var selectedCities: [Int] {
@@ -33,8 +36,9 @@ class WeatherViewModel: WeatherViewModelProtocol {
     }
   }
 
-  init(service: WeatherServiceProtocol) {
-    weatherService = service
+  init(service: WeatherServiceProtocol, coordinator: AppCoordinator) {
+    self.weatherService = service
+    self.coordinator = coordinator
 
     bind()
   }
@@ -56,5 +60,9 @@ class WeatherViewModel: WeatherViewModelProtocol {
       .map { $0.list }
       .bind(to: weathers)
       .disposed(by: disposeBag)
+
+    pushToNextScene.subscribe { _ in
+      self.coordinator?.showCityViewController()
+    }.disposed(by: disposeBag)
   }
 }

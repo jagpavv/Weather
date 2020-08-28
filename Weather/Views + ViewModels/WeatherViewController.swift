@@ -7,6 +7,7 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
+  private lazy var addCityButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
 
   var viewModel: WeatherViewModelProtocol! = nil
   weak var coordinator: AppCoordinator?
@@ -52,6 +53,13 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
 
     view.addSubview(indicator)
     indicator.center = self.view.center
+
+    title = "Weather"
+    self.navigationItem.rightBarButtonItem = addCityButton
+  }
+
+  @objc func addTapped() {
+    print("tapped")
   }
 }
 

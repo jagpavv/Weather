@@ -1,19 +1,26 @@
 
 import UIKit
 
+enum Route {
+  case weatherList
+  case weatherDetail(weather: WeatherInfo)
+  case cityList
+}
+
 protocol Coordinator {
   var childCoordinators: [Coordinator] { get set }
   var navigationController: UINavigationController { get set }
 
   func start()
+  func trigger(route: Route)
 }
 
 class AppCoordinator: Coordinator {
+
   var childCoordinators = [Coordinator]()
   var navigationController: UINavigationController
 
   private let weatherService = WeatherService()
-//  private lazy var weatherViewModel = WeatherViewModel(service: weatherService)
   private lazy var weatherViewModel = WeatherViewModel(service: weatherService, coordinator: self)
 
   init(navigationController: UINavigationController) {
@@ -21,14 +28,20 @@ class AppCoordinator: Coordinator {
   }
 
   func start() {
-    let weatherViewController = WeatherViewController.initFromStoryboard(with: "WeatherViewController")
-//    weatherViewController.coordinator = self
-    weatherViewController.viewModel = weatherViewModel
-    navigationController.viewControllers = [weatherViewController]
+    trigger(route: .weatherList)
   }
 
-  func showCityViewController() {
-    let cityViewController = CityViewController.initFromStoryboard(with: "CityViewController")
-    navigationController.pushViewController(cityViewController, animated: true)
+  func trigger(route: Route) {
+    switch route {
+    case .weatherList:
+      let weatherViewController = WeatherViewController.initFromStoryboard(with: "WeatherViewController")
+      weatherViewController.viewModel = weatherViewModel
+      navigationController.viewControllers = [weatherViewController]
+    case .weatherDetail(let weather):
+      print("detail", weather)
+    case .cityList:
+      let cityViewController = CityViewController.initFromStoryboard(with: "CityViewController")
+      navigationController.pushViewController(cityViewController, animated: true)
+    }
   }
 }

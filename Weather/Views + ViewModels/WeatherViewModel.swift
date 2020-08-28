@@ -10,21 +10,24 @@ protocol WeatherViewModelProtocol {
 
   // Input
   var requestWeather: PublishSubject<Void> { get }
-  var selectedCity: PublishSubject<Int> { get }
-  var pushToNextScene: PublishSubject<Void> { get }
+//  var selectedCity: PublishSubject<Int> { get } // addCity
+  var addCitySelected: PublishSubject<Void> { get }
+  var weatherSelected: PublishSubject<WeatherInfo> { get }
 }
 
 class WeatherViewModel: WeatherViewModelProtocol {
   private let kSelectedCityIDsKey = "selectedCityIDs"
   private let weatherService: WeatherServiceProtocol
-  private weak var coordinator: AppCoordinator?
+  private let coordinator: Coordinator
 
   let weathers: BehaviorSubject<[WeatherInfo]> = BehaviorSubject(value: [])
   let isLoading: BehaviorRelay<Bool> = BehaviorRelay(value: false)
 
   let selectedCity: PublishSubject<Int> = PublishSubject()
   let requestWeather: PublishSubject<Void> = PublishSubject()
-  let pushToNextScene: PublishSubject<Void> = PublishSubject()
+  let addCitySelected: PublishSubject<Void> = PublishSubject()
+  let weatherSelected: PublishSubject<WeatherInfo> = PublishSubject()
+
   let disposeBag = DisposeBag()
 
   private var selectedCities: [Int] {
@@ -36,7 +39,7 @@ class WeatherViewModel: WeatherViewModelProtocol {
     }
   }
 
-  init(service: WeatherServiceProtocol, coordinator: AppCoordinator) {
+  init(service: WeatherServiceProtocol, coordinator: Coordinator) {
     self.weatherService = service
     self.coordinator = coordinator
 
@@ -61,8 +64,16 @@ class WeatherViewModel: WeatherViewModelProtocol {
       .bind(to: weathers)
       .disposed(by: disposeBag)
 
-    pushToNextScene.subscribe { _ in
-      self.coordinator?.showCityViewController()
-    }.disposed(by: disposeBag)
+    addCitySelected
+      .subscribe { _ in
+        self.coordinator.trigger(route: .cityList)
+      }.disposed(by: disposeBag)
+
+
+    weatherSelected
+      .subscribe(onNext: { weather in
+        self.coordinator.trigger(route: .weatherDetail(weather: weather))
+      })
+      .disposed(by: disposeBag)
   }
 }

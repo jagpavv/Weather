@@ -35,6 +35,14 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
       }
       .disposed(by: disposeBag)
 
+    tableView.rx.modelSelected(WeatherInfo.self)
+      .do(onNext: { [unowned self] indexPath in
+        guard let indexPath = self.tableView.indexPathForSelectedRow else { return }
+        self.tableView.deselectRow(at: indexPath, animated: true)
+      })
+      .bind(to: viewModel.weatherSelected)
+      .disposed(by: disposeBag)
+
     // load weather data only once
     viewModel.weathers
       .filter { $0.isEmpty }
@@ -47,7 +55,7 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
       .disposed(by: disposeBag)
 
     addCityButton.rx.tap
-      .bind(to: viewModel.pushToNextScene)
+      .bind(to: viewModel.addCitySelected)
       .disposed(by: disposeBag)
   }
 

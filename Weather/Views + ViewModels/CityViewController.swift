@@ -1,11 +1,13 @@
-//import UIKit
+import UIKit
 //
 //protocol SearchCityDelegate: class {
 //  func searchCityDelegateSelectedCity(id: Int)
 //}
 //
-//class SearchCityViewController: UIViewController {
-//
+class CityViewController: UIViewController, StoryboardInstantiable {
+
+  @IBOutlet weak var tableView: UITableView!
+
 //  private let viewModel: SearchCityViewModelProtocol = SearchCityViewModel()
 //  private let cellIdentifier = "serchedCityDisplayCell"
 //  private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
@@ -16,15 +18,17 @@
 //  @IBOutlet weak var tableView: UITableView!
 //  @IBOutlet weak var searchBar: UISearchBar!
 //
-//  override func viewDidLoad() {
-//    super.viewDidLoad()
-//
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    title = "Cities"
+    view.backgroundColor = .red
 //    viewModel.cities.bind { cities in
 //      print("cities count:", cities.count)
 //      DispatchQueue.main.async {
 //        self.tableView.reloadData()
 //      }
-//    }
+    }
 //
 //    viewModel.filteredCity.bind { filteredCity in
 //      print("viewdidload filteredCity", filteredCity.count)
@@ -98,4 +102,4 @@
 //    viewModel.searchBarUpdated(text: searchBar.text, isTextEmpty: searchText.isEmpty)
 ////    stopAnimatimgIndicator()
 //  }
-//}
+}

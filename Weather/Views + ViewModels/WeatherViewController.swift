@@ -7,9 +7,9 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
   private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
+  private let addCityButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: nil)
 
   var viewModel: WeatherViewModelProtocol! = nil
-  weak var coordinator: AppCoordinator?
   private let disposeBag = DisposeBag()
 
   private lazy var callOnce: Void = {
@@ -35,6 +35,14 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
       }
       .disposed(by: disposeBag)
 
+    tableView.rx.modelSelected(WeatherInfo.self)
+      .do(onNext: { [unowned self] indexPath in
+        guard let indexPath = self.tableView.indexPathForSelectedRow else { return }
+        self.tableView.deselectRow(at: indexPath, animated: true)
+      })
+      .bind(to: viewModel.weatherSelected)
+      .disposed(by: disposeBag)
+
     // load weather data only once
     viewModel.weathers
       .filter { $0.isEmpty }
@@ -45,6 +53,10 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
     viewModel.isLoading
       .bind(to: indicator.rx.isAnimating)
       .disposed(by: disposeBag)
+
+    addCityButton.rx.tap
+      .bind(to: viewModel.addCitySelected)
+      .disposed(by: disposeBag)
   }
 
   func setUI() {
@@ -52,6 +64,9 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
 
     view.addSubview(indicator)
     indicator.center = self.view.center
+
+    title = "Weather"
+    self.navigationItem.rightBarButtonItem = addCityButton
   }
 }
 

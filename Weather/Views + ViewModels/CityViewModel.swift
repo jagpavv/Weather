@@ -27,7 +27,13 @@ class CityViewModel: CityViewModelProtocol {
   }
 
   func bind() {
-    print("called bind")
+
+    requestCities
+      .flatMap { _ in
+      self.cityService.getCities()
+      }
+      .bind(to: cities)
+      .disposed(by: disposeBag)
   }
 }
 

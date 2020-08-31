@@ -1,4 +1,6 @@
 import UIKit
+import RxSwift
+import RxCocoa
 //
 //protocol SearchCityDelegate: class {
 //  func searchCityDelegateSelectedCity(id: Int)
@@ -7,6 +9,8 @@ import UIKit
 class CityViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
+
+  var viewModel: CityViewModel! = nil
 
 //  private let viewModel: SearchCityViewModelProtocol = SearchCityViewModel()
 //  private let cellIdentifier = "serchedCityDisplayCell"

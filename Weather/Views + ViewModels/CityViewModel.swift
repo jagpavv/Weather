@@ -1,6 +1,36 @@
-//
-//import Foundation
-//import UIKit.NSDataAsset
+
+import Foundation
+import RxSwift
+import RxCocoa
+
+protocol CityViewModelProtocol {
+  // Output
+  var cities: BehaviorSubject<[City]> { get }
+
+  // Input
+  var requestCities: PublishSubject<Void> { get }
+
+}
+
+class CityViewModel: CityViewModelProtocol {
+
+  let cities: BehaviorSubject<[City]> = BehaviorSubject(value: [])
+
+  let requestCities: PublishSubject<Void> = PublishSubject()
+
+  let cityService: CityServiceProtocol
+  let disposeBag = DisposeBag()
+
+  init(service: CityServiceProtocol) {
+    self.cityService = service
+    bind()
+  }
+
+  func bind() {
+    print("called bind")
+  }
+}
+
 //
 //protocol SearchCityViewModelProtocol {
 //  // Output

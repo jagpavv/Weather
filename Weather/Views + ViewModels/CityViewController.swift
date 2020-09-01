@@ -1,4 +1,6 @@
 import UIKit
+import RxSwift
+import RxCocoa
 //
 //protocol SearchCityDelegate: class {
 //  func searchCityDelegateSelectedCity(id: Int)
@@ -7,59 +9,61 @@ import UIKit
 class CityViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
+  private let searchController = UISearchController(searchResultsController: nil)
 
-//  private let viewModel: SearchCityViewModelProtocol = SearchCityViewModel()
-//  private let cellIdentifier = "serchedCityDisplayCell"
+  var viewModel: CityViewModel! = nil
+  private let disposeBag = DisposeBag()
+
+  private lazy var callOnce: Void = {
+    bind()
+  }()
+
 //  private let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
-//
-//  weak var delegate: SearchCityDelegate?
-////  var completionHandlers: ((Int) -> Void)?
-//
-//  @IBOutlet weak var tableView: UITableView!
-//  @IBOutlet weak var searchBar: UISearchBar!
-//
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    setSearchController()
+    setNavigationBar()
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+
+    _ = callOnce
+  }
+
+  func bind() {
+
+    viewModel.cities
+      .bind(to: tableView.rx.items(cellIdentifier: CityTableViewCell.identifier, cellType: CityTableViewCell.self)) { (row, city, cell) in
+        cell.fillCell(data: city)
+      }
+      .disposed(by: disposeBag)
+
+    searchController.searchBar.rx.text.orEmpty
+      .debounce(.seconds(1), scheduler: MainScheduler.instance)
+      .distinctUntilChanged()
+      .bind(to: viewModel.searchKeyword)
+      .disposed(by: disposeBag)
+  }
+
+  func setSearchController() {
+    searchController.becomeFirstResponder()
+    searchController.obscuresBackgroundDuringPresentation = false
+    searchController.searchBar.placeholder = "Search city"
+  }
+
+  func setNavigationBar() {
     title = "Cities"
-    view.backgroundColor = .red
-//    viewModel.cities.bind { cities in
-//      print("cities count:", cities.count)
-//      DispatchQueue.main.async {
-//        self.tableView.reloadData()
-//      }
-    }
-//
-//    viewModel.filteredCity.bind { filteredCity in
-//      print("viewdidload filteredCity", filteredCity.count)
-//      DispatchQueue.main.async {
-//        self.tableView.reloadData()
-//      }
-//    }
-//  }
-//
-//  override func viewDidAppear(_ animated: Bool) {
-//    super.viewDidAppear(animated)
-//    searchBar.becomeFirstResponder()
-//  }
-//
-//  func startAnimatimgIndicator() {
-//    DispatchQueue.main.async {
-//      self.indicator.center = self.view.center
-//      self.indicator.startAnimating()
-//      self.indicator.hidesWhenStopped = false
-//      self.view.addSubview(self.indicator)
-//    }
-//  }
-//
-//  func stopAnimatimgIndicator() {
-//    DispatchQueue.main.async {
-//      self.indicator.stopAnimating()
-//      self.indicator.hidesWhenStopped = true
-//      self.indicator.removeFromSuperview()
-//    }
-//  }
-//}
+    navigationItem.hidesSearchBarWhenScrolling = false
+    definesPresentationContext = true
+
+    navigationItem.searchController = searchController
+  }
+}
+
+
 //
 //// MARK:- UITableViewDataSource, UITableViewDelegate
 //extension SearchCityViewController: UITableViewDataSource, UITableViewDelegate {
@@ -102,4 +106,4 @@ class CityViewController: UIViewController, StoryboardInstantiable {
 //    viewModel.searchBarUpdated(text: searchBar.text, isTextEmpty: searchText.isEmpty)
 ////    stopAnimatimgIndicator()
 //  }
-}
+

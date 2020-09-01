@@ -23,6 +23,9 @@ class AppCoordinator: Coordinator {
   private let weatherService = WeatherService()
   private lazy var weatherViewModel = WeatherViewModel(service: weatherService, coordinator: self)
 
+  private let cityService = CityService()
+  private lazy var cityViewModel = CityViewModel(service: cityService)
+
   init(navigationController: UINavigationController) {
     self.navigationController = navigationController
   }
@@ -41,6 +44,7 @@ class AppCoordinator: Coordinator {
       print("detail", weather)
     case .cityList:
       let cityViewController = CityViewController.initFromStoryboard(with: "CityViewController")
+      cityViewController.viewModel = cityViewModel
       navigationController.pushViewController(cityViewController, animated: true)
     }
   }

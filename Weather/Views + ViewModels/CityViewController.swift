@@ -25,8 +25,7 @@ class CityViewController: UIViewController, StoryboardInstantiable {
 
     setSearchController()
     setNavigationBar()
-
-    }
+  }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
@@ -42,11 +41,11 @@ class CityViewController: UIViewController, StoryboardInstantiable {
       }
       .disposed(by: disposeBag)
 
-    viewModel.cities
-      .filter { $0.isEmpty }
-      .map{ _ in }
-      .bind(to: viewModel.requestCities)
-      .dispose()
+    searchController.searchBar.rx.text.orEmpty
+      .debounce(.seconds(1), scheduler: MainScheduler.instance)
+      .distinctUntilChanged()
+      .bind(to: viewModel.searchKeyword)
+      .disposed(by: disposeBag)
   }
 
   func setSearchController() {

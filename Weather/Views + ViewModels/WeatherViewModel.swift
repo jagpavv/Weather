@@ -53,10 +53,19 @@ class WeatherViewModel: WeatherViewModelProtocol {
       .bind(to: isLoading)
       .disposed(by: disposeBag)
 
-    requestWeather
+    let requeset = requestWeather
       .map { self.selectedCities }
-      .map { $0.map { String($0) }.joined(separator: ",")
-      }
+      .share()
+
+    requeset
+      .filter { !$0.isEmpty }
+      .map { _ in []}
+      .bind(to: weathers)
+      .disposed(by: disposeBag)
+
+    requeset
+      .filter { !$0.isEmpty }
+      .map { $0.map { String($0) }.joined(separator: ",") }
       .flatMap { cities in
         self.weatherService.getWeather(cityIDString: cities)
       }
@@ -68,7 +77,6 @@ class WeatherViewModel: WeatherViewModelProtocol {
       .subscribe { _ in
         self.coordinator.trigger(route: .cityList)
       }.disposed(by: disposeBag)
-
 
     weatherSelected
       .subscribe(onNext: { weather in

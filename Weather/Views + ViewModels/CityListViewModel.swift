@@ -3,28 +3,38 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-protocol CityViewModelProtocol {
+protocol CityListViewModelProtocol {
   // Output
   var cities: BehaviorSubject<[City]> { get }
 
   // Input
   var searchKeyword: PublishSubject<String> { get }
-
+  var selectedCityId: PublishSubject<Int> { get }
 }
 
-class CityViewModel: CityViewModelProtocol {
+protocol CitySelectionDelegate: class {
+  func citySelectionDelegateDidSelectCity(id: Int)
+}
+
+class CityListViewModel: CityListViewModelProtocol {
+
+  weak var delegate: CitySelectionDelegate?
+  private let cityService: CityServiceProtocol
+  private let coordinator: Coordinator
 
   private let allCities: BehaviorSubject<[City]> = BehaviorSubject(value: [])
 
   let cities: BehaviorSubject<[City]> = BehaviorSubject(value: [])
 
   let searchKeyword: PublishSubject<String> = PublishSubject()
+  let selectedCityId: PublishSubject<Int> = PublishSubject()
 
-  let cityService: CityServiceProtocol
   let disposeBag = DisposeBag()
 
-  init(service: CityServiceProtocol) {
+  init(service: CityServiceProtocol, coordinator: Coordinator) {
     self.cityService = service
+    self.coordinator = coordinator
+    
     bind()
   }
 
@@ -37,6 +47,13 @@ class CityViewModel: CityViewModelProtocol {
     cities
       .subscribe(onNext: { cities in
         print(cities.count)
+      })
+      .disposed(by: disposeBag)
+
+    selectedCityId
+      .subscribe(onNext: { id in
+        self.delegate?.citySelectionDelegateDidSelectCity(id: id)
+        self.coordinator.trigger(route: .back)
       })
       .disposed(by: disposeBag)
 

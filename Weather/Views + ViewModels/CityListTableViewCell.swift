@@ -1,8 +1,8 @@
 
 import UIKit
 
-class CityTableViewCell: UITableViewCell {
-  static let identifier = String(describing: CityTableViewCell.self)
+class CityListTableViewCell: UITableViewCell {
+  static let identifier = String(describing: CityListTableViewCell.self)
 
   @IBOutlet weak var cityLabel: UILabel!
 

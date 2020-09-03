@@ -1,17 +1,13 @@
 import UIKit
 import RxSwift
 import RxCocoa
-//
-//protocol SearchCityDelegate: class {
-//  func searchCityDelegateSelectedCity(id: Int)
-//}
-//
-class CityViewController: UIViewController, StoryboardInstantiable {
+
+class CityListViewController: UIViewController, StoryboardInstantiable {
 
   @IBOutlet weak var tableView: UITableView!
   private let searchController = UISearchController(searchResultsController: nil)
 
-  var viewModel: CityViewModel! = nil
+  var viewModel: CityListViewModel! = nil
   private let disposeBag = DisposeBag()
 
   private lazy var callOnce: Void = {
@@ -36,7 +32,7 @@ class CityViewController: UIViewController, StoryboardInstantiable {
   func bind() {
 
     viewModel.cities
-      .bind(to: tableView.rx.items(cellIdentifier: CityTableViewCell.identifier, cellType: CityTableViewCell.self)) { (row, city, cell) in
+      .bind(to: tableView.rx.items(cellIdentifier: CityListTableViewCell.identifier, cellType: CityListTableViewCell.self)) { (row, city, cell) in
         cell.fillCell(data: city)
       }
       .disposed(by: disposeBag)
@@ -46,6 +42,26 @@ class CityViewController: UIViewController, StoryboardInstantiable {
       .distinctUntilChanged()
       .bind(to: viewModel.searchKeyword)
       .disposed(by: disposeBag)
+
+    tableView.rx.modelSelected(City.self)
+      .do(onNext: { [unowned self] indexPath in
+        guard let indexPath = self.tableView.indexPathForSelectedRow else { return }
+        self.tableView.deselectRow(at: indexPath, animated: true)
+      })
+      .map { $0.id }
+      .bind(to: viewModel.selectedCityId)
+      .disposed(by: disposeBag)
+
+// F.O
+//    tableView.rx.modelSelected(HolidayViewModel.self)
+//      .bind(to: viewModel.selectedHoliday)
+//      .disposed(by: disposeBag)
+//
+//    tableView.rx.itemSelected
+//      .subscribe(onNext: { (indexPath) in
+//        self.tableView.deselectRow(at: indexPath, animated: true)
+//      })
+//      .disposed(by: disposeBag)
   }
 
   func setSearchController() {

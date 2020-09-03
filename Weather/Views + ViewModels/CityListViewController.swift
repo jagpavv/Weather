@@ -51,17 +51,6 @@ class CityListViewController: UIViewController, StoryboardInstantiable {
       .map { $0.id }
       .bind(to: viewModel.selectedCityId)
       .disposed(by: disposeBag)
-
-// F.O
-//    tableView.rx.modelSelected(HolidayViewModel.self)
-//      .bind(to: viewModel.selectedHoliday)
-//      .disposed(by: disposeBag)
-//
-//    tableView.rx.itemSelected
-//      .subscribe(onNext: { (indexPath) in
-//        self.tableView.deselectRow(at: indexPath, animated: true)
-//      })
-//      .disposed(by: disposeBag)
   }
 
   func setSearchController() {
@@ -78,48 +67,3 @@ class CityListViewController: UIViewController, StoryboardInstantiable {
     navigationItem.searchController = searchController
   }
 }
-
-
-//
-//// MARK:- UITableViewDataSource, UITableViewDelegate
-//extension SearchCityViewController: UITableViewDataSource, UITableViewDelegate {
-//  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//    return searchBar.text?.isEmpty ?? true ? 0 : viewModel.filteredCity.value.count
-//  }
-//
-//  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//    let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: self.cellIdentifier, for: indexPath)
-//    let city = viewModel.filteredCity.value[indexPath.row]
-//    cell.textLabel?.text = city.name + ", " + city.country
-//    return cell
-//  }
-//
-//  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-////    guard let completionHandlers = completionHandlers else { return }
-////    completionHandlers(viewModel.filteredCity.value[indexPath.row].id)
-//    delegate?.searchCityDelegateSelectedCity(id: viewModel.filteredCity.value[indexPath.row].id)
-//    dismiss(animated: true)
-//  }
-//}
-//
-//// MARK:- UIScrollViewDelegate
-//extension SearchCityViewController: UIScrollViewDelegate {
-//  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//    guard searchBar.isFirstResponder else { return }
-//    searchBar.resignFirstResponder()
-//  }
-//}
-//
-//// MARK:- UISearchBarDelegate
-//extension SearchCityViewController: UISearchBarDelegate {
-//  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-//    searchBar.text = ""
-//    dismiss(animated: true, completion: nil)
-//  }
-//
-//  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-////    startAnimatimgIndicator()
-//    viewModel.searchBarUpdated(text: searchBar.text, isTextEmpty: searchText.isEmpty)
-////    stopAnimatimgIndicator()
-//  }
-

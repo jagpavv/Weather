@@ -5,7 +5,7 @@ import RxCocoa
 protocol WeatherServiceProtocol {
   var isLoading: BehaviorRelay<Bool> { get }
 
-  func getWeather(cityIDString: String) -> Single<WeatherResult>
+  func getWeather(cityIDs: [String]) -> Single<WeatherResult>
 }
 
 class WeatherService: WeatherServiceProtocol {
@@ -20,16 +20,24 @@ class WeatherService: WeatherServiceProtocol {
   }()
 
   let isLoading: BehaviorRelay<Bool> = BehaviorRelay(value: false)
-  func getWeather(cityIDString: String) -> Single<WeatherResult> {
+
+  func getWeather(cityIDs: [String]) -> Single<WeatherResult> {
+
     return Single.create { [weak self] singleObserver in
       let disposable = Disposables.create()
 
-      guard let self = self,
-            var components = URLComponents(string: self.baseURL + self.path) else {
-        singleObserver(.error(NSError()))
+      let cities = cityIDs.map { String($0) }.joined(separator: ",")
+      guard !cities.isEmpty else {
+        singleObserver(.success(WeatherResult(list: [], cnt: 0)))
         return disposable
       }
-      components.queryItems = [URLQueryItem(name: "id", value: cityIDString),
+
+      guard let self = self,
+        var components = URLComponents(string: self.baseURL + self.path) else {
+          singleObserver(.error(NSError()))
+          return disposable
+      }
+      components.queryItems = [URLQueryItem(name: "id", value: cities),
                                URLQueryItem(name: "units", value: "metric"),
                                URLQueryItem(name: "APPID", value: self.OpenWeatherAPIKey)]
 
@@ -55,7 +63,22 @@ class WeatherService: WeatherServiceProtocol {
           singleObserver(.error(error))
         }
       }.resume()
+
       return disposable
     }
   }
 }
+
+/*
+ let response = Observable.from([repo])
+ .map { urlString -> URL in
+ return URL(string: "https://api.github.com/repos/\(urlString)/events")! }
+ .map { url -> URLRequest in
+   return URLRequest(url: url)
+ }
+ .flatMap { request -> Observable<(response: HTTPURLResponse, data: Data)> // here need to catch error code - Chapter14
+ in
+ return URLSession.shared.rx.response(request: request) }
+
+ .share(replay: 1, scope: .whileConnected)
+ */

@@ -4,7 +4,8 @@ import UIKit
 enum Route {
   case weatherList
   case weatherDetail(weather: WeatherInfo)
-  case cityList
+  case cityList(delegate: CitySelectionDelegate?)
+  case back
 }
 
 protocol Coordinator {
@@ -24,7 +25,7 @@ class AppCoordinator: Coordinator {
   private lazy var weatherViewModel = WeatherViewModel(service: weatherService, coordinator: self)
 
   private let cityService = CityService()
-  private lazy var cityViewModel = CityViewModel(service: cityService)
+  private lazy var cityListViewModel = CityListViewModel(service: cityService, coordinator: self)
 
   init(navigationController: UINavigationController) {
     self.navigationController = navigationController
@@ -42,10 +43,13 @@ class AppCoordinator: Coordinator {
       navigationController.viewControllers = [weatherViewController]
     case .weatherDetail(let weather):
       print("detail", weather)
-    case .cityList:
-      let cityViewController = CityViewController.initFromStoryboard(with: "CityViewController")
-      cityViewController.viewModel = cityViewModel
-      navigationController.pushViewController(cityViewController, animated: true)
+    case .cityList(let delegate):
+      let cityListViewController = CityListViewController.initFromStoryboard(with: "CityListViewController")
+      cityListViewModel.delegate = delegate
+      cityListViewController.viewModel = cityListViewModel
+      navigationController.pushViewController(cityListViewController, animated: true)
+    case .back:
+      navigationController.popViewController(animated: true)
     }
   }
 }

@@ -69,25 +69,3 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
     self.navigationItem.rightBarButtonItem = addCityButton
   }
 }
-
-//// MARK: - Navigation
-//  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//    if segue.identifier == "searchCitySegue" {
-//      let dest = segue.destination as? SearchCityViewController
-//      dest?.delegate = self
-////      dest?.completionHandlers = { [weak self] id in
-////        self?.viewModel.addCity(id: id)
-////        print("completionHandlers", id)
-////      }
-//    }
-//  }
-//}
-//
-//extension WeatherViewController: SearchCityDelegate {
-//  func searchCityDelegateSelectedCity(id: Int) {
-//
-//    viewModel.selectedCitySubject.onNext(id)
-//
-//    print(id)
-//  }
-//}

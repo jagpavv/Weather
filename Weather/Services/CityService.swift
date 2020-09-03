@@ -17,13 +17,12 @@ class CityService: CityServiceProtocol {
     return Single.create { observer in
       let disposable = Disposables.create()
 
+      var cities: [City] = []
+
       if let citiesData = UserDefaults.standard.object(forKey: self.kCityListKey) as? Data {
-        let cities = try! NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(citiesData) as! [City]
-        observer(.success(cities))
-        return disposable
+        cities = try! NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(citiesData) as! [City]
       } else if let asset = NSDataAsset(name: self.kCityListKey, bundle: Bundle.main) {
         do {
-          var cities = [City]()
           if let json = try? JSONSerialization.jsonObject(with: asset.data, options: []) as! [[String: Any]] {
             json.forEach { (cityJson) in
               DispatchQueue.global(qos: .background).async {
@@ -35,6 +34,7 @@ class CityService: CityServiceProtocol {
           }
         }
       }
+      observer(.success(cities))
       return disposable
     }
   }

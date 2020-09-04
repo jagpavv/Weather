@@ -12,6 +12,8 @@ protocol WeatherViewModelProtocol {
   var requestWeather: PublishSubject<Void> { get }
   var addCitySelected: PublishSubject<Void> { get }
   var weatherSelected: PublishSubject<WeatherInfo> { get }
+
+  func deleteCity(at: Int)
 }
 
 class WeatherViewModel: WeatherViewModelProtocol {
@@ -75,6 +77,11 @@ class WeatherViewModel: WeatherViewModelProtocol {
       .disposed(by: disposeBag)
   }
 
+  func deleteCity(at indexPathRow: Int) {
+    var newArray = cities.value
+    newArray.remove(at: indexPathRow)
+    cities.accept(newArray)
+  }
 }
 
 extension WeatherViewModel: CitySelectionDelegate {

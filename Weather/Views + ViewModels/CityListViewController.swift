@@ -38,7 +38,7 @@ class CityListViewController: UIViewController, StoryboardInstantiable {
       .disposed(by: disposeBag)
 
     searchController.searchBar.rx.text.orEmpty
-      .debounce(.seconds(1), scheduler: MainScheduler.instance)
+      .throttle(.seconds(3), scheduler: MainScheduler.instance)
       .distinctUntilChanged()
       .bind(to: viewModel.searchKeyword)
       .disposed(by: disposeBag)

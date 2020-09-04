@@ -43,6 +43,12 @@ class WeatherViewController: UIViewController, StoryboardInstantiable {
       .bind(to: viewModel.weatherSelected)
       .disposed(by: disposeBag)
 
+    tableView.rx.itemDeleted
+      .subscribe(onNext: { [unowned self] indexPath in
+        self.viewModel.deleteCity(at: indexPath.row)
+      })
+      .disposed(by: disposeBag)
+
     // load weather data only once
     viewModel.weathers
       .filter { $0.isEmpty }
